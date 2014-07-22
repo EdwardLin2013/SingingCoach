@@ -40,6 +40,10 @@ static OSStatus	performRender (void                         *inRefCon,
         // filter out the DC component of the signal
         cd.dcRejectionFilter->ProcessInplace((Float32*) ioData->mBuffers[0].mData, inNumberFrames);
         
+        // fill up the audioDataBuffer
+        cd.bufferManager->CopyAudioDataToBuffer((Float32*)ioData->mBuffers[0].mData, inNumberFrames);
+        
+        /*
         // fill up the buffer for Audio Wave
         cd.bufferManager->CopyAudioDataToWaveBuffer((Float32*)ioData->mBuffers[0].mData, inNumberFrames);
         
@@ -61,6 +65,7 @@ static OSStatus	performRender (void                         *inRefCon,
                 //NSLog(@"cd.currentFramesWave: %lld", cd.currentFramesWave);
             }
         }
+        */
         
         // mute audio if needed....mute the echo?
         for (UInt32 i=0; i<ioData->mNumberBuffers; ++i)
@@ -73,7 +78,7 @@ static OSStatus	performRender (void                         *inRefCon,
 @implementation AudioController
 
 /* -----------------------------Public Methods--------------------------------- Begin */
-- (id)init:(UInt32)NewSampleRate FrameSize:(UInt32)NewFrameSize
+- (id)init:(UInt32)NewSampleRate FrameSize:(UInt32)NewFrameSize OverLap:(Float32)NewOverlap
 {
     if (self = [super init])
     {
@@ -82,9 +87,17 @@ static OSStatus	performRender (void                         *inRefCon,
         
         _sampleRate = NewSampleRate;
         _framesSize = NewFrameSize;
+        _Overlap = NewOverlap;
+        
+        _frequency = 0;
+        _midiNum = 0;
+        _pitch = @"nil";
+        
+        _pitchEstimatedScheduler = NULL;
         
         _Hz120 = floor(120*(float)_framesSize/(float)_sampleRate);
         _Hz530 = floor(530*(float)_framesSize/(float)_sampleRate);
+        _Hz1100 = floor(1100*(float)_framesSize/(float)_sampleRate);
         
         _isRecording = NO;
         _FileNameWave = @"audioWave.wav";
@@ -98,15 +111,30 @@ static OSStatus	performRender (void                         *inRefCon,
 {
     OSStatus err = AudioOutputUnitStart(_rioUnit);
     if (err) NSLog(@"couldn't start AURemoteIO: %d", (int)err);
+    
+    NSTimeInterval interval = (double)(((1-_Overlap)*(Float32)_framesSize)/(Float32)_sampleRate);
+    
+    // Also start the Pitch Estimation
+    _pitchEstimatedScheduler = [NSTimer scheduledTimerWithTimeInterval:interval
+                                     target:self
+                                   selector:@selector(EstimatePitch)
+                                   userInfo:nil
+                                    repeats:YES];
+    
     return err;
 }
 - (OSStatus)stopIOUnit
 {
     OSStatus err = AudioOutputUnitStop(_rioUnit);
     if (err) NSLog(@"couldn't stop AURemoteIO: %d", (int)err);
+    
+    // Stop the Pitch Estimation
+    [_pitchEstimatedScheduler invalidate];
+    _pitchEstimatedScheduler = NULL;
+    
     return err;
 }
-- (NSString*)EstimatePitch
+- (void)EstimatePitch
 {
     if (_bufferManager != NULL)
     {
@@ -123,7 +151,7 @@ static OSStatus	performRender (void                         *inRefCon,
             
             Float32 _maxAmp = -INFINITY;
             int _bin = _Hz120;
-            for (int i=_Hz120; i<=_Hz530; i++)
+            for (int i=_Hz120; i<=_Hz1100; i++)
             {
                 _curAmp = fftcepstrumData[i];
                 if (_curAmp > _maxAmp)
@@ -133,17 +161,16 @@ static OSStatus	performRender (void                         *inRefCon,
                 }
             }
             
-            Float32 _frequency = _bin*((float)_sampleRate/(float)_framesSize);
-            Float32 _midiNum = [self freqToMIDI:_frequency];
-            return [self midiToPitch:_midiNum];
-            
-            //Float32 _midiNum = [self freqToMIDI:_frequency];
-            //NSString* _pitch = [self midiToPitch:_midiNum];
+            _frequency = _bin*((float)_sampleRate/(float)_framesSize);
+            _midiNum = [self freqToMIDI:_frequency];
+            _pitch = [self midiToPitch:_midiNum];
             //NSLog(@"Current: %.12f %d %.12f %@", _frequency, _bin, _midiNum, _pitch);
         }
     }
-    
-    return NULL;
+}
+- (NSString*)CurrentPitch
+{
+    return _pitch;
 }
 /* -----------------------------Public Methods--------------------------------- End */
 
@@ -242,7 +269,7 @@ static OSStatus	performRender (void                         *inRefCon,
         UInt32 propSize = sizeof(UInt32);
         XThrowIfError(AudioUnitGetProperty(_rioUnit, kAudioUnitProperty_MaximumFramesPerSlice, kAudioUnitScope_Global, 0, &_framesSize, &propSize), "couldn't get max frames per slice on AURemoteIO");
         
-        _bufferManager = new BufferManager(_framesSize);
+        _bufferManager = new BufferManager(_framesSize, _sampleRate, _Overlap);
         _dcRejectionFilter = new DCRejectionFilter;
         
         // We need references to certain data in the render callback
@@ -414,7 +441,7 @@ static OSStatus	performRender (void                         *inRefCon,
     // Do the recording if needed
     if (_isRecording==YES && _bufferManager->HasNewFFTData())
     {
-        const void* fftData = _bufferManager->GetFFTInputBuffers();
+        const void* fftData = _bufferManager->GetFFTBuffers();
         
         // write packets to file
         UInt32 inNumberFrames = _framesSize;

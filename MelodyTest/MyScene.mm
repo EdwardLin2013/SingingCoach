@@ -116,17 +116,7 @@
     _sampleRate = 44100;
     _framesSize = 4096;
     
-    _audioController = [[AudioController alloc] init:_sampleRate FrameSize:_framesSize];
-    _bufferManager = [_audioController getBufferManagerInstance];
-    _l_fftData = (Float32*) calloc(_framesSize, sizeof(Float32));
-    _l_cepstrumData = (Float32*) calloc(_framesSize, sizeof(Float32));
-    _l_fftcepstrumData = (Float32*) calloc(_framesSize, sizeof(Float32));
-    
-    _sampleRate = [_audioController sessionSampleRate];
-    
-    _Hz120 = floor(120*(float)_framesSize/(float)_sampleRate);
-    _Hz530 = floor(530*(float)_framesSize/(float)_sampleRate);
-    
+    _audioController = [[AudioController alloc] init:_sampleRate FrameSize:_framesSize OverLap:0];
     [_audioController startIOUnit];
     
 }
@@ -316,6 +306,7 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay{
                 
                 [self.view presentScene:songChoose transition:[SKTransition fadeWithDuration:1.5]];
                 
+                [_audioController stopIOUnit];
             }
         }}
     
@@ -333,6 +324,8 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay{
             songChoose.scaleMode = SKSceneScaleModeAspectFill;
             
             [self.view presentScene:songChoose transition:[SKTransition fadeWithDuration:1.5]];
+            
+            [_audioController stopIOUnit];
         }
     }
     
@@ -557,7 +550,7 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay{
 //Method called by Update to check pitch of the input Soundwave
 -(void)pitchUpdate
 {
-    _pitch = [_audioController EstimatePitch];
+    _pitch = [_audioController CurrentPitch];
     int distance = [self getNoteDistance:_pitch];
     float yPositionforArrow  =  C3Ypos + 13* distance + 1;
     
