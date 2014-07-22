@@ -11,17 +11,6 @@
 
 BufferManager::BufferManager( UInt32  NewFramesSize, UInt32  NewSamplingRate, Float32 NewOverlap )
 {
-    /*
-    for(UInt32 i=0; i<kNumDrawBuffers; ++i)
-    {
-        _WaveBuffers[i] = (Float32*) calloc(_framesSize, sizeof(Float32));
-        _FFTBuffers[i] = (Float32*) calloc(_framesSize, sizeof(Float32));
-    }
-    
-    _FFTInputBuffer = (Float32*) calloc(_framesSize, sizeof(Float32));
-    _FFTInputBuffer_Backup = (Float32*) calloc(_framesSize, sizeof(Float32));
-    _WaveFFTCepstrumHelper = new WaveFFTCepstrumHelper(_framesSize);
-    */
     _FrameSize = NewFramesSize;
     _SamplingRate = NewSamplingRate;
     _BufferLen = _SamplingRate * 5;         // Store 5 seconds audio data
