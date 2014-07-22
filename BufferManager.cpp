@@ -11,17 +11,6 @@
 
 BufferManager::BufferManager( UInt32  NewFramesSize, UInt32  NewSamplingRate, Float32 NewOverlap )
 {
-    /*
-    for(UInt32 i=0; i<kNumDrawBuffers; ++i)
-    {
-        _WaveBuffers[i] = (Float32*) calloc(_framesSize, sizeof(Float32));
-        _FFTBuffers[i] = (Float32*) calloc(_framesSize, sizeof(Float32));
-    }
-    
-    _FFTInputBuffer = (Float32*) calloc(_framesSize, sizeof(Float32));
-    _FFTInputBuffer_Backup = (Float32*) calloc(_framesSize, sizeof(Float32));
-    _WaveFFTCepstrumHelper = new WaveFFTCepstrumHelper(_framesSize);
-    */
     _FrameSize = NewFramesSize;
     _SamplingRate = NewSamplingRate;
     _BufferLen = _SamplingRate * 5;         // Store 5 seconds audio data
@@ -38,18 +27,6 @@ BufferManager::BufferManager( UInt32  NewFramesSize, UInt32  NewSamplingRate, Fl
 }
 BufferManager::~BufferManager()
 {
-    /*
-    for(UInt32 i=0; i<kNumDrawBuffers; ++i)
-    {
-        free(_WaveBuffers[i]);
-        _WaveBuffers[i] = NULL;
-        
-        free(_FFTBuffers[i]);
-        _FFTBuffers[i] = NULL;
-    }
-    free(_FFTInputBuffer);
-    */
-    
     _AudioDataBuffer = NULL;
     free(_AudioDataBuffer);
     
@@ -128,9 +105,12 @@ void BufferManager::GetFFTOutput( Float32* outFFTData )
 {
     if (HasNewFFTData())
     {
-        _WaveFFTCepstrumHelper->ComputeABSFFT(GetFFTBuffers(), outFFTData);
+        Float32* _FFTBuffer = GetFFTBuffers();
+        _WaveFFTCepstrumHelper->ComputeABSFFT(_FFTBuffer, outFFTData);
         
         ManageFFTBuffer();
+        
+        free(_FFTBuffer);
         
         OSAtomicDecrement32Barrier(&_HasNewFFTData);
         OSAtomicIncrement32Barrier(&_NeedsNewFFTData);
