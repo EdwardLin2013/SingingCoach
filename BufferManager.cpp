@@ -38,18 +38,6 @@ BufferManager::BufferManager( UInt32  NewFramesSize, UInt32  NewSamplingRate, Fl
 }
 BufferManager::~BufferManager()
 {
-    /*
-    for(UInt32 i=0; i<kNumDrawBuffers; ++i)
-    {
-        free(_WaveBuffers[i]);
-        _WaveBuffers[i] = NULL;
-        
-        free(_FFTBuffers[i]);
-        _FFTBuffers[i] = NULL;
-    }
-    free(_FFTInputBuffer);
-    */
-    
     _AudioDataBuffer = NULL;
     free(_AudioDataBuffer);
     
@@ -128,9 +116,12 @@ void BufferManager::GetFFTOutput( Float32* outFFTData )
 {
     if (HasNewFFTData())
     {
-        _WaveFFTCepstrumHelper->ComputeABSFFT(GetFFTBuffers(), outFFTData);
+        Float32* _FFTBuffer = GetFFTBuffers();
+        _WaveFFTCepstrumHelper->ComputeABSFFT(_FFTBuffer, outFFTData);
         
         ManageFFTBuffer();
+        
+        free(_FFTBuffer);
         
         OSAtomicDecrement32Barrier(&_HasNewFFTData);
         OSAtomicIncrement32Barrier(&_NeedsNewFFTData);
