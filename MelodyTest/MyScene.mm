@@ -571,56 +571,6 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay{
     CGPoint position = CGPointMake(starting, yPositionforArrow + 5);
     SKAction *moveToLocation = [SKAction moveTo:position duration:0.2];
     [Arrow runAction:moveToLocation];
-    
-    /*
-     if (_bufferManager != NULL)
-     {
-     if(_bufferManager->HasNewFFTData())
-     {
-     [_audioController GetFFTOutput:_l_fftData];
-     _bufferManager->GetCepstrumOutput(_l_fftData, _l_cepstrumData);
-     _bufferManager->GetFFTCepstrumOutput(_l_fftData, _l_cepstrumData, _l_fftcepstrumData);
-     
-     _maxAmp = -INFINITY;
-     _bin = _Hz120;
-     for (int i=_Hz120; i<=_Hz530; i++)
-     {
-     _curAmp = _l_fftcepstrumData[i];
-     if (_curAmp > _maxAmp)
-     {
-     _maxAmp = _curAmp;
-     _bin = i;
-     }
-     }
-     
-     _frequency = _bin*((float)_sampleRate/(float)_framesSize);
-     _midiNum = [_audioController freqToMIDI:_frequency];
-     _pitch = [_audioController midiToPitch:_midiNum];
-     
-     int distance = [self getNoteDistance:_pitch];
-     float yPositionforArrow  =  C3Ypos + 13* distance + 1;
-     
-     if (yPositionforArrow <0){
-     yPositionforArrow = 0 + 3;
-     }
-     else if(yPositionforArrow > framesize.height){
-     yPositionforArrow = framesize.height - 3;
-     }
-     
-     CGPoint position = CGPointMake(starting, yPositionforArrow + 5);
-     SKAction *moveToLocation = [SKAction moveTo:position duration:0.2];
-     [Arrow runAction:moveToLocation];
-     NSLog(@"Current: %.12f %d %.12f %@", _frequency, _bin, _midiNum, _pitch);
-     
-     _bufferManager->CycleFFTBuffers();
-     
-     memset(_l_fftData, 0, _framesSize*sizeof(Float32));
-     memset(_l_cepstrumData, 0, _framesSize*sizeof(Float32));
-     memset(_l_fftcepstrumData, 0, _framesSize*sizeof(Float32));
-     
-     }
-     }
-     */
 }
 
 
