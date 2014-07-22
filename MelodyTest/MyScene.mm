@@ -555,18 +555,16 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay{
 }
 
 //Method called by Update to check pitch of the input Soundwave
--(void)pitchUpdate{
-    
+-(void)pitchUpdate
+{
     _pitch = [_audioController EstimatePitch];
     int distance = [self getNoteDistance:_pitch];
     float yPositionforArrow  =  C3Ypos + 13* distance + 1;
     
-    if (yPositionforArrow <0){
+    if (yPositionforArrow <0)
         yPositionforArrow = 0 + 3;
-    }
-    else if(yPositionforArrow > framesize.height){
+    else if(yPositionforArrow > framesize.height)
         yPositionforArrow = framesize.height - 3;
-    }
     
     CGPoint position = CGPointMake(starting, yPositionforArrow + 5);
     SKAction *moveToLocation = [SKAction moveTo:position duration:0.2];
