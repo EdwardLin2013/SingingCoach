@@ -1,0 +1,34 @@
+//
+//  SongChooseMenu.h
+//  MelodyTest
+//
+//  Created by CrimsonLycans on 12/7/14.
+//  Copyright (c) 2014 CrimsonLycans. All rights reserved.
+//
+
+#import <SpriteKit/SpriteKit.h>
+#import "MainMenu.h"
+#import "MyScene.h"
+#import <AVFoundation/AVFoundation.h>
+
+
+@interface SongChooseMenu : SKScene<UITextFieldDelegate>
+
+{
+    AVAudioPlayer *_player;
+    AVAudioPlayer *_listen;
+    
+    double _scaleH;
+    double _scaleW;
+    
+    int _listenButtonChandelierState;//state whether chandelier listen button is pressed
+    SKSpriteNode *_ChandelierListenNode;
+    
+    SKSpriteNode *_customSongOvr;
+    int _cusSongState;//state whether customsong is pressed
+    
+    UITextField *_textField;
+    int fileNotFound;//state whether file is found
+    SKSpriteNode *FileNotFound;
+}
+@end

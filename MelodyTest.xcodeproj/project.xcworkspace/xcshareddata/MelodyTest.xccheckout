@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>AFB37C02-8554-4FA0-B8F8-3381C1726A79</string>
+	<key>IDESourceControlProjectName</key>
+	<string>MelodyTest</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>5BB258E8-F114-4241-A9E3-22423DB8857F</key>
+		<string>https://github.com/EdwardLin2013/SingingCoach.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>MelodyTest.xcodeproj/project.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>5BB258E8-F114-4241-A9E3-22423DB8857F</key>
+		<string>../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/EdwardLin2013/SingingCoach.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>110</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>5BB258E8-F114-4241-A9E3-22423DB8857F</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>5BB258E8-F114-4241-A9E3-22423DB8857F</string>
+			<key>IDESourceControlWCCName</key>
+			<string>MelodyTest Ver3 FFT</string>
+		</dict>
+	</array>
+</dict>
+</plist>
