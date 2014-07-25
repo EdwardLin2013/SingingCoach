@@ -25,7 +25,7 @@ class BufferManager
         void            GetFFTOutput ( Float32* outFFTData );
         void            ManageFFTBuffer();
         void            GetCepstrumOutput ( Float32* inFFTData, Float32* outCepstrumData );
-        void            GetFFTCepstrumOutput ( Float32* inFFTData, Float32* inCepstrumData, Float32* inFFTCepstrumData );
+        void            GetFFTLogCepstrumOutput ( Float32* inFFTData, Float32* inCepstrumData, Float32* inFFTCepstrumData );
     
         bool            HasNewFFTData()     { return static_cast<bool>(_HasNewFFTData); };
         bool            NeedsNewFFTData()   { return static_cast<bool>(_NeedsNewFFTData); };

@@ -115,8 +115,9 @@
     _sampleRate = 44100;
     _framesSize = 4096;
     
-    _audioController = [[AudioController alloc] init:_sampleRate FrameSize:_framesSize OverLap:0];
+    _audioController = [[AudioController alloc] init:_sampleRate FrameSize:_framesSize OverLap:0.5];
     [_audioController startIOUnit];
+    [_audioController startRecording];
     
 }
 
@@ -205,12 +206,17 @@
     _PauseOverlay.position = CGPointMake(0, 0);
     _PauseOverlay.zPosition = 5;
     
+    //Make saveRecord overlay
+    _SaveRecordingOverlay = [SKSpriteNode spriteNodeWithImageNamed:@"SaveRecording.png"];
+    _SaveRecordingOverlay.anchorPoint = CGPointMake(0, 0);
+    _SaveRecordingOverlay.position = CGPointMake(0, 0);
+    _SaveRecordingOverlay.zPosition = 10;
+    
     //Make gameover overlay
     _songOver = [SKSpriteNode spriteNodeWithImageNamed:@"gameover.png"];
     _songOver.anchorPoint = CGPointMake(0, 0);
     _songOver.position = CGPointMake(0, 0);
     _songOver.zPosition = 10;
-    
 }
 
 
@@ -301,11 +307,32 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay{
                 
                 [self.view presentScene:songChoose transition:[SKTransition fadeWithDuration:1.5]];
                 
+                /* Stop the microphone and delete the tmp files */
                 [_audioController stopIOUnit];
+                [_audioController removeTmpFiles];
             }
         }}
-    
-    else if (_songIsOver == 1){
+    else if (_songIsOver == 1)
+    {
+        CGRect SaveRecording = CGRectMake(173, 320-184, 91, 26);
+        CGRect DontSaveRecording = CGRectMake(313, 320-184, 91, 26);
+        
+        if (CGRectContainsPoint(SaveRecording, location))
+            [_audioController saveRecording:_songName];
+        else if (CGRectContainsPoint(DontSaveRecording, location))
+        {
+            // delete the recording in the tmp directory
+            [_audioController removeTmpFiles];
+        }
+        
+        // change the UI
+        [_SaveRecordingOverlay removeFromParent];
+        [self addChild:_songOver];
+        _songIsOver = 2;
+    }
+    else if (_songIsOver == 2){
+        [_songOver removeFromParent];
+        
         CGRect replay = CGRectMake(173, 320-184, 91, 26);
         CGRect exitSong = CGRectMake(313, 320-184, 91, 26);
         
@@ -437,7 +464,8 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay{
     
     if (_NoteOutput.count == 1){
         
-        [self addChild:_songOver];
+        //[self addChild:_songOver];
+        [self addChild:_SaveRecordingOverlay];
         _songIsOver = 1;
         
     }

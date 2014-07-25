@@ -13,10 +13,10 @@ struct CallbackData {
     DCRejectionFilter*                    dcRejectionFilter;
     BOOL*                                 muteAudio;
     BOOL*                                 audioChainIsBeingReconstructed;
-    AudioFileID                           WaveFile;
-    AudioFileID                           FFTFile;
-    SInt64                                currentFramesWave;
-    SInt64                                currentFramesFFT;
+    AudioFileID                           OriginalFile;
+    AudioFileID                           FramesFile;
+    SInt64                                currentIdxOriginal;
+    SInt64                                currentIdxFrames;
     BOOL*                                 isRecording;
     
     CallbackData(): rioUnit(NULL), bufferManager(NULL), muteAudio(NULL), audioChainIsBeingReconstructed(NULL) {}
@@ -43,29 +43,17 @@ static OSStatus	performRender (void                         *inRefCon,
         // fill up the audioDataBuffer
         cd.bufferManager->CopyAudioDataToBuffer((Float32*)ioData->mBuffers[0].mData, inNumberFrames);
         
-        /*
-        // fill up the buffer for Audio Wave
-        cd.bufferManager->CopyAudioDataToWaveBuffer((Float32*)ioData->mBuffers[0].mData, inNumberFrames);
-        
-        // fill up the buffer for FFT
-        if (cd.bufferManager->NeedsNewFFTData())
-        {
-            //cd.bufferManager->CopyAudioDataToFFTInputBuffer((Float32*)ioData->mBuffers[0].mData, inNumberFrames);
-            cd.bufferManager->CopyAudioDataToFFTInputBufferVer2((Float32*)ioData->mBuffers[0].mData, inNumberFrames);
-        }
-        
         // Do the recording if needed
         if (cd.isRecording)
         {
             if (inNumberFrames > 0)
             {
                 // write packets to file
-                err = AudioFileWritePackets(cd.WaveFile, FALSE, inNumberFrames, NULL, cd.currentFramesWave, &inNumberFrames, ioData->mBuffers[0].mData);
-                cd.currentFramesWave += inNumberFrames;
-                //NSLog(@"cd.currentFramesWave: %lld", cd.currentFramesWave);
+                err = AudioFileWritePackets(cd.OriginalFile, FALSE, inNumberFrames, NULL, cd.currentIdxOriginal, &inNumberFrames, ioData->mBuffers[0].mData);
+                cd.currentIdxOriginal += inNumberFrames;
+                //NSLog(@"cd.currentIdxOriginal: %lld", cd.currentIdxOriginal);
             }
         }
-        */
         
         // mute audio if needed....mute the echo?
         for (UInt32 i=0; i<ioData->mNumberBuffers; ++i)
@@ -100,10 +88,18 @@ static OSStatus	performRender (void                         *inRefCon,
         _Hz1100 = floor(1100*(float)_framesSize/(float)_sampleRate);
         
         _isRecording = NO;
-        _FileNameWave = @"audioWave.wav";
-        _FileNameFFT = @"audioFFT.wav";
+        _FileNameOriginal = @"audioOriginal.wav";
+        _FileNameFrames = @"audioFrames.wav";
         
+        // Only connect to microphone
         [self setupAudioChain];
+        
+        NSError *error;
+        NSFileManager *fileMgr = [NSFileManager defaultManager];
+        NSString *documentDir = [NSHomeDirectory() stringByAppendingPathComponent: @"Documents/"];
+        
+        NSLog(@"tmpDir %@",[fileMgr contentsOfDirectoryAtPath:NSTemporaryDirectory() error:&error]);
+        NSLog(@"documentDir %@",[fileMgr contentsOfDirectoryAtPath:documentDir error:&error]);
     }
     return self;
 }
@@ -116,10 +112,10 @@ static OSStatus	performRender (void                         *inRefCon,
     
     // Also start the Pitch Estimation
     _pitchEstimatedScheduler = [NSTimer scheduledTimerWithTimeInterval:interval
-                                     target:self
-                                   selector:@selector(EstimatePitch)
-                                   userInfo:nil
-                                    repeats:YES];
+                                                                target:self
+                                                              selector:@selector(EstimatePitch)
+                                                              userInfo:nil
+                                                               repeats:YES];
     
     return err;
 }
@@ -142,18 +138,18 @@ static OSStatus	performRender (void                         *inRefCon,
         {
             Float32 fftData[_framesSize];
             Float32 cepstrumData[_framesSize];
-            Float32 fftcepstrumData[_framesSize];
+            Float32 fftlogcepstrumData[_framesSize];
             Float32 _curAmp;
             
             [self GetFFTOutput:fftData];
             _bufferManager->GetCepstrumOutput(fftData, cepstrumData);
-            _bufferManager->GetFFTCepstrumOutput(fftData, cepstrumData, fftcepstrumData);
+            _bufferManager->GetFFTLogCepstrumOutput(fftData, cepstrumData, fftlogcepstrumData);
             
             Float32 _maxAmp = -INFINITY;
             int _bin = _Hz120;
             for (int i=_Hz120; i<=_Hz1100; i++)
             {
-                _curAmp = fftcepstrumData[i];
+                _curAmp = fftlogcepstrumData[i];
                 if (_curAmp > _maxAmp)
                 {
                     _maxAmp = _curAmp;
@@ -379,10 +375,6 @@ static OSStatus	performRender (void                         *inRefCon,
     _audioChainIsBeingReconstructed = NO;
 }
 
-- (BufferManager*)getBufferManagerInstance
-{
-    return _bufferManager;
-}
 - (UInt32)getFrameSize
 {
     return _framesSize;
@@ -401,23 +393,23 @@ static OSStatus	performRender (void                         *inRefCon,
     if(!_isRecording)
     {
         // create the audio file
-        NSString *filePathWave = [NSHomeDirectory() stringByAppendingPathComponent: _FileNameWave];
-        NSString *filePathFFT = [NSHomeDirectory() stringByAppendingPathComponent: _FileNameFFT];
+        NSString *filePathOriginal = [NSTemporaryDirectory() stringByAppendingPathComponent: _FileNameOriginal];
+        NSString *filePathFrames = [NSTemporaryDirectory() stringByAppendingPathComponent: _FileNameFrames];
         
-        CFURLRef urlWave = CFURLCreateWithFileSystemPath(kCFAllocatorDefault, (CFStringRef)filePathWave, kCFURLPOSIXPathStyle, false);
-        CFURLRef urlFFT = CFURLCreateWithFileSystemPath(kCFAllocatorDefault, (CFStringRef)filePathFFT, kCFURLPOSIXPathStyle, false);
+        CFURLRef urlOriginal = CFURLCreateWithFileSystemPath(kCFAllocatorDefault, (CFStringRef)filePathOriginal, kCFURLPOSIXPathStyle, false);
+        CFURLRef urlFrames = CFURLCreateWithFileSystemPath(kCFAllocatorDefault, (CFStringRef)filePathFrames, kCFURLPOSIXPathStyle, false);
         NSLog(@"Start Recording");
-        NSLog(@"Wave at: %@", urlWave);
-        NSLog(@"FFT at: %@", urlFFT);
-        XThrowIfError(AudioFileCreateWithURL(urlWave, kAudioFileWAVEType, &_ioFormat, kAudioFileFlags_EraseFile, &_WaveFile), "AudioFileCreateWithURL failed");
-        XThrowIfError(AudioFileCreateWithURL(urlFFT, kAudioFileWAVEType, &_ioFormat, kAudioFileFlags_EraseFile, &_FFTFile), "AudioFileCreateWithURL failed");
-        CFRelease(urlWave);
-        CFRelease(urlFFT);
+        NSLog(@"Original at: %@", urlOriginal);
+        NSLog(@"Frames at: %@", urlFrames);
+        XThrowIfError(AudioFileCreateWithURL(urlOriginal, kAudioFileWAVEType, &_ioFormat, kAudioFileFlags_EraseFile, &_OriginalFile), "Original: AudioFileCreateWithURL failed");
+        XThrowIfError(AudioFileCreateWithURL(urlFrames, kAudioFileWAVEType, &_ioFormat, kAudioFileFlags_EraseFile, &_FramesFile), "Frames: AudioFileCreateWithURL failed");
+        CFRelease(urlOriginal);
+        CFRelease(urlFrames);
         
-        cd.WaveFile = _WaveFile;
-        cd.FFTFile = _FFTFile;
-        cd.currentFramesWave = 0;
-        cd.currentFramesFFT = 0;
+        cd.OriginalFile = _OriginalFile;
+        cd.FramesFile = _FramesFile;
+        cd.currentIdxOriginal = 0;
+        cd.currentIdxFrames = 0;
         _isRecording = YES;
         cd.isRecording = &_isRecording;
     }
@@ -445,14 +437,14 @@ static OSStatus	performRender (void                         *inRefCon,
         
         // write packets to file
         UInt32 inNumberFrames = _framesSize;
-        XThrowIfError(AudioFileWritePackets(cd.FFTFile, FALSE, _framesSize, NULL, cd.currentFramesFFT, &inNumberFrames, fftData), "Cannot write data to FFTfile?");
-        cd.currentFramesFFT += inNumberFrames;
-        //NSLog(@"cd.currentFramesFFT: %lld", cd.currentFramesFFT);
+        XThrowIfError(AudioFileWritePackets(cd.FramesFile, FALSE, _framesSize, NULL, cd.currentIdxFrames, &inNumberFrames, fftData), "Cannot write data to FFTfile?");
+        cd.currentIdxFrames += inNumberFrames;
+        //NSLog(@"cd.currentIdxFrames: %lld", cd.currentIdxFrames);
     }
-    else if(_isRecording==NO && cd.currentFramesFFT>0)
+    else if(_isRecording==NO && cd.currentIdxFrames>0)
     {
-        AudioFileClose(_WaveFile);
-        AudioFileClose(_FFTFile);
+        AudioFileClose(_OriginalFile);
+        AudioFileClose(_FramesFile);
     }
     
     _bufferManager->GetFFTOutput(outFFTData);
@@ -494,6 +486,79 @@ static OSStatus	performRender (void                         *inRefCon,
         retval = [retval stringByAppendingString:@"8"];
     
     return retval;
+}
+
+- (void)removeTmpFiles
+{
+    NSError *error;
+    NSFileManager *fileMgr = [NSFileManager defaultManager];
+    NSString *tmpDir = NSTemporaryDirectory();
+    NSString *tmpOriginalFile = [tmpDir stringByAppendingString:@"audioOriginal.wav"];
+    NSString *tmpFramesFile = [tmpDir stringByAppendingString:@"audioFrames.wav"];
+    
+    if([fileMgr removeItemAtPath:tmpOriginalFile error:&error])
+        NSLog(@"Yes, files are removed: %@", tmpOriginalFile);
+    else
+    {
+        NSLog(@"No, files are removed: %@", tmpOriginalFile);
+        NSLog(@"No, error is %@", error);
+    }
+    if([fileMgr removeItemAtPath:tmpFramesFile error:&error])
+        NSLog(@"Yes, files are removed %@", tmpFramesFile);
+    else
+    {
+        NSLog(@"No, files are removed: %@", tmpFramesFile);
+        NSLog(@"No, error is %@", error);
+    }
+}
+
+// Move the audio files from tmp directory to Document directory
+- (void)saveRecording:(NSString *)SongName
+{
+    NSError *error;
+    NSFileManager *fileMgr = [NSFileManager defaultManager];
+    
+    NSArray *dirPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask, YES);
+    NSString *docsDir =dirPaths[0];
+    NSString *tmpDir = NSTemporaryDirectory();
+    NSLog(@"doc path: %@", docsDir);
+    NSLog(@"tmp path: %@", tmpDir);
+    
+    NSString *tmpOriginalFile = [tmpDir stringByAppendingString:@"audioOriginal.wav"];
+    NSString *tmpFramesFile = [tmpDir stringByAppendingString:@"audioFrames.wav"];
+    
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"yyyyMMdd_HHmm"];
+    NSString *strNow = [dateFormatter stringFromDate:[NSDate date]];
+    
+    NSString *OriginalDocFileName = SongName;
+    OriginalDocFileName = [OriginalDocFileName stringByAppendingString:@"_Original_"];
+    OriginalDocFileName = [OriginalDocFileName stringByAppendingString:strNow];
+    OriginalDocFileName = [OriginalDocFileName stringByAppendingString:@".wav"];
+    NSString *FramesDocFileName = SongName;
+    FramesDocFileName = [FramesDocFileName stringByAppendingString:@"_Frames_"];
+    FramesDocFileName = [FramesDocFileName stringByAppendingString:strNow];
+    FramesDocFileName = [FramesDocFileName stringByAppendingString:@".wav"];
+
+    NSString *docOriginalFile = [docsDir stringByAppendingString:@"/"];
+    docOriginalFile = [docOriginalFile stringByAppendingString:OriginalDocFileName];
+    NSString *docFramesFile = [docsDir stringByAppendingString:@"/"];
+    docFramesFile = [docFramesFile stringByAppendingString:FramesDocFileName];
+    
+    if([fileMgr moveItemAtPath:tmpOriginalFile toPath:docOriginalFile error:&error])
+        NSLog(@"Yes, files are moved to %@", docOriginalFile);
+    else
+    {
+        NSLog(@"No, files are not moved to %@", docOriginalFile);
+        NSLog(@"No, error is %@", error);
+    }
+    if([fileMgr moveItemAtPath:tmpFramesFile toPath:docFramesFile error:&error])
+        NSLog(@"Yes, files are moved to %@", docFramesFile);
+    else
+    {
+        NSLog(@"No, files are not moved to %@", docFramesFile);
+        NSLog(@"No, error is %@", error);
+    }
 }
 /* -----------------------------Private Methods--------------------------------- Begin */
 

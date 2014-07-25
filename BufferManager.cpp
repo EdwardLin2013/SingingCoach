@@ -137,7 +137,7 @@ void BufferManager::GetCepstrumOutput ( Float32* inFFTData, Float32* outCepstrum
     _WaveFFTCepstrumHelper->ComputeCepstrum(inFFTData, outCepstrumData);
 }
 
-void BufferManager::GetFFTCepstrumOutput ( Float32* inFFTData, Float32* inCepstrumData, Float32* inFFTCepstrumData )
+void BufferManager::GetFFTLogCepstrumOutput ( Float32* inFFTData, Float32* inCepstrumData, Float32* inFFTCepstrumData )
 {
-    _WaveFFTCepstrumHelper->ComputeFFTCepstrum(inFFTData, inCepstrumData, inFFTCepstrumData);
+    _WaveFFTCepstrumHelper->ComputeFFTLogCepstrum(inFFTData, inCepstrumData, inFFTCepstrumData);
 }
