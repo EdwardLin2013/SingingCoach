@@ -603,7 +603,7 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay{
             [self clashCheck];
             
             //Do Pitch Detection
-            if (_checkPitch%5 == 0){
+            if (_checkPitch%2 == 0){
                 [self pitchUpdate];
                 
                 _checkPitch = 1;
