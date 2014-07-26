@@ -75,7 +75,7 @@
 		DFC7385A1948EE0600BED0EA /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DFC738321948EE0600BED0EA /* UIKit.framework */; };
 		DFC738621948EE0600BED0EA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = DFC738601948EE0600BED0EA /* InfoPlist.strings */; };
 		DFC738641948EE0600BED0EA /* MelodyTestTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DFC738631948EE0600BED0EA /* MelodyTestTests.m */; };
-		DFD497B619836F5A006ED587 /* SaveRecording.png in Resources */ = {isa = PBXBuildFile; fileRef = DFD497B519836F5A006ED587 /* SaveRecording.png */; };
+		DFD497B819840A1A006ED587 /* SaveRecording.png in Resources */ = {isa = PBXBuildFile; fileRef = DFD497B719840A1A006ED587 /* SaveRecording.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -177,7 +177,7 @@
 		DFC7385F1948EE0600BED0EA /* MelodyTestTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "MelodyTestTests-Info.plist"; sourceTree = "<group>"; };
 		DFC738611948EE0600BED0EA /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		DFC738631948EE0600BED0EA /* MelodyTestTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MelodyTestTests.m; sourceTree = "<group>"; };
-		DFD497B519836F5A006ED587 /* SaveRecording.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SaveRecording.png; path = "../../../../../../Volumes/NO NAME/SingingApp/SaveRecording.png"; sourceTree = "<group>"; };
+		DFD497B719840A1A006ED587 /* SaveRecording.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = SaveRecording.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -227,7 +227,6 @@
 		DF29C8621979145D00E22487 /* SingingApp */ = {
 			isa = PBXGroup;
 			children = (
-				DFD497B519836F5A006ED587 /* SaveRecording.png */,
 				DF29C8631979145D00E22487 /* 1beat.png */,
 				DF408D28197ABC2D007414CF /* arrow2.png */,
 				DFA584F7197C1FD800218B1B /* beneathyourbeautiful.mp3 */,
@@ -236,6 +235,7 @@
 				DFA584F8197C1FD800218B1B /* chandelier.mp3 */,
 				DF29C8651979145D00E22487 /* Chandelier.png */,
 				DF91453F197BAB8C007AC4EE /* chandelierSia.txt */,
+				DFD497B719840A1A006ED587 /* SaveRecording.png */,
 				DF29C8671979145D00E22487 /* CustomSong.png */,
 				DF73AD9B197A92D5009FA5C7 /* customSongOverlay.png */,
 				DF29C87D197919CD00E22487 /* exitSure.png */,
@@ -462,6 +462,7 @@
 			files = (
 				DF914540197BAB8C007AC4EE /* chandelierSia.txt in Resources */,
 				DFA584EA197BC24000218B1B /* pianoB2B4.png in Resources */,
+				DFD497B819840A1A006ED587 /* SaveRecording.png in Resources */,
 				DFC738511948EE0600BED0EA /* Images.xcassets in Resources */,
 				DF73AD9E197A92D5009FA5C7 /* gameover.png in Resources */,
 				DF547A791960FF0700B6A3FC /* ScoreLine.png in Resources */,
@@ -478,7 +479,6 @@
 				DF29C8751979145D00E22487 /* Listen.png in Resources */,
 				DFA584F3197C1B7500218B1B /* pianoG3G5.png in Resources */,
 				DF29C8741979145D00E22487 /* Interface-Game.png in Resources */,
-				DFD497B619836F5A006ED587 /* SaveRecording.png in Resources */,
 				DF408D2B197ABC36007414CF /* pauseWord.png in Resources */,
 				DF29C87E197919CD00E22487 /* exitSure.png in Resources */,
 				DF29C8731979145D00E22487 /* Interface-Game-2.png in Resources */,
