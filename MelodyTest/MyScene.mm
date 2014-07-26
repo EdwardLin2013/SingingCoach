@@ -333,8 +333,8 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay{
     else if (_songIsOver == 2){
         [_songOver removeFromParent];
         
-        CGRect replay = CGRectMake(173, 320-184, 91, 26);
-        CGRect exitSong = CGRectMake(313, 320-184, 91, 26);
+        CGRect replay = CGRectMake(173, 320-171, 91, 26);
+        CGRect exitSong = CGRectMake(313, 320-171, 91, 26);
         
         if (CGRectContainsPoint(replay, location)){
             SKScene *replaySong = [[MyScene alloc]initWithSize:self.size withSongName:_songName withTempo:_tempo withDelay:_delay withInput:_StringInput withC3YPos:_C3Ypos withPianoName:_pianoName];
@@ -371,7 +371,7 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay{
     
     NSString* oct = [noteName substringFromIndex:noteName.length-1];
     NSString* newNoteName = [noteName substringToIndex:noteName.length-1];
-    int difference = (oct.integerValue - 3)*_octaveValue;
+    int difference = ((int)(oct.integerValue) - 3)*_octaveValue;
     
     if ([newNoteName compare:@"C"]==0){
         answer = 0 + difference;

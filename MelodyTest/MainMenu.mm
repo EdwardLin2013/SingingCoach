@@ -16,7 +16,6 @@
 
 -(id)initWithSize:(CGSize)size {
     if (self = [super initWithSize:size]) {
-        
         SKSpriteNode *BG  = [SKSpriteNode spriteNodeWithImageNamed:@"MainMenuPic.png"];
         BG.anchorPoint = CGPointMake(0,0);
         BG.position = CGPointMake(0, 0);

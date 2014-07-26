@@ -145,7 +145,6 @@
 
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event{
     CGPoint location =[ [touches anyObject] locationInNode:self];
-    
     NSError *err;
     NSString *path  = [[NSBundle mainBundle] pathForResource:@"button" ofType:@"mp3"];
     NSURL *url = [NSURL fileURLWithPath:path];
