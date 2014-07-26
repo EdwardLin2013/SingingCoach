@@ -12,10 +12,10 @@
 @interface NoteClass : NSObject
 
 {
-    SKSpriteNode* _NoteShape;
-    float _length;
-    NSString* _pitch;
-    float _yLocation;
+    SKSpriteNode*   _NoteShape;
+    float           _length;
+    NSString*       _pitch;
+    float           _yLocation;
     
 }
 

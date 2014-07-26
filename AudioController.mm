@@ -95,16 +95,29 @@ static OSStatus	performRender (void                         *inRefCon,
         [self setupAudioChain];
         
         NSError *error;
-        NSFileManager *fileMgr = [NSFileManager defaultManager];
-        NSString *documentDir = [NSHomeDirectory() stringByAppendingPathComponent: @"Documents/"];
-        
-        NSLog(@"tmpDir %@",[fileMgr contentsOfDirectoryAtPath:NSTemporaryDirectory() error:&error]);
-        NSLog(@"documentDir %@",[fileMgr contentsOfDirectoryAtPath:documentDir error:&error]);
+        _fileMgr = [NSFileManager defaultManager];
+
+        NSArray *dirPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask, YES);
+        _docsDir =dirPaths[0];
+        _tmpDir = NSTemporaryDirectory();
+        NSLog(@"tmpDir:%@ directory content:%@",_tmpDir, [_fileMgr contentsOfDirectoryAtPath:_tmpDir error:&error]);
+        NSLog(@"documentDir:%@ directory content:%@",_docsDir, [_fileMgr contentsOfDirectoryAtPath:_docsDir error:&error]);
     }
     return self;
 }
 - (OSStatus)startIOUnit
 {
+    _bufferManager = new BufferManager(_framesSize, _sampleRate, _Overlap);
+    _dcRejectionFilter = new DCRejectionFilter;
+    
+    // We need references to certain data in the render callback
+    // This simple struct is used to hold that information
+    
+    cd.rioUnit = _rioUnit;
+    cd.bufferManager = _bufferManager;
+    cd.dcRejectionFilter = _dcRejectionFilter;
+    cd.audioChainIsBeingReconstructed = &_audioChainIsBeingReconstructed;
+    
     OSStatus err = AudioOutputUnitStart(_rioUnit);
     if (err) NSLog(@"couldn't start AURemoteIO: %d", (int)err);
     
@@ -121,13 +134,19 @@ static OSStatus	performRender (void                         *inRefCon,
 }
 - (OSStatus)stopIOUnit
 {
+    // Stop the Pitch Estimation
+    if (_pitchEstimatedScheduler != NULL)
+    {
+        [_pitchEstimatedScheduler invalidate];
+        _pitchEstimatedScheduler = NULL;
+    }
+    
     OSStatus err = AudioOutputUnitStop(_rioUnit);
     if (err) NSLog(@"couldn't stop AURemoteIO: %d", (int)err);
     
-    // Stop the Pitch Estimation
-    [_pitchEstimatedScheduler invalidate];
-    _pitchEstimatedScheduler = NULL;
-    
+    delete _bufferManager;  _bufferManager = NULL;
+    delete _dcRejectionFilter; _dcRejectionFilter = NULL;
+
     return err;
 }
 - (void)EstimatePitch
@@ -167,6 +186,18 @@ static OSStatus	performRender (void                         *inRefCon,
 - (NSString*)CurrentPitch
 {
     return _pitch;
+}
+- (UInt32)getFrameSize
+{
+    return _framesSize;
+}
+- (double)sessionSampleRate
+{
+    return [[AVAudioSession sharedInstance] sampleRate];
+}
+- (BOOL)audioChainIsBeingReconstructed
+{
+    return _audioChainIsBeingReconstructed;
 }
 /* -----------------------------Public Methods--------------------------------- End */
 
@@ -264,17 +295,6 @@ static OSStatus	performRender (void                         *inRefCon,
         // Get the property value back from AURemoteIO. We are going to use this value to allocate buffers accordingly
         UInt32 propSize = sizeof(UInt32);
         XThrowIfError(AudioUnitGetProperty(_rioUnit, kAudioUnitProperty_MaximumFramesPerSlice, kAudioUnitScope_Global, 0, &_framesSize, &propSize), "couldn't get max frames per slice on AURemoteIO");
-        
-        _bufferManager = new BufferManager(_framesSize, _sampleRate, _Overlap);
-        _dcRejectionFilter = new DCRejectionFilter;
-        
-        // We need references to certain data in the render callback
-        // This simple struct is used to hold that information
-        
-        cd.rioUnit = _rioUnit;
-        cd.bufferManager = _bufferManager;
-        cd.dcRejectionFilter = _dcRejectionFilter;
-        cd.audioChainIsBeingReconstructed = &_audioChainIsBeingReconstructed;
         
         // Set the render callback on AURemoteIO
         AURenderCallbackStruct renderCallback;
@@ -375,18 +395,6 @@ static OSStatus	performRender (void                         *inRefCon,
     _audioChainIsBeingReconstructed = NO;
 }
 
-- (UInt32)getFrameSize
-{
-    return _framesSize;
-}
-- (double)sessionSampleRate
-{
-    return [[AVAudioSession sharedInstance] sampleRate];
-}
-- (BOOL)audioChainIsBeingReconstructed
-{
-    return _audioChainIsBeingReconstructed;
-}
 
 - (void)startRecording
 {
@@ -433,13 +441,15 @@ static OSStatus	performRender (void                         *inRefCon,
     // Do the recording if needed
     if (_isRecording==YES && _bufferManager->HasNewFFTData())
     {
-        const void* fftData = _bufferManager->GetFFTBuffers();
+        Float32* fftData = _bufferManager->GetFFTBuffers();
         
         // write packets to file
         UInt32 inNumberFrames = _framesSize;
         XThrowIfError(AudioFileWritePackets(cd.FramesFile, FALSE, _framesSize, NULL, cd.currentIdxFrames, &inNumberFrames, fftData), "Cannot write data to FFTfile?");
         cd.currentIdxFrames += inNumberFrames;
         //NSLog(@"cd.currentIdxFrames: %lld", cd.currentIdxFrames);
+        
+        free(fftData); fftData = NULL;
     }
     else if(_isRecording==NO && cd.currentIdxFrames>0)
     {
@@ -515,17 +525,10 @@ static OSStatus	performRender (void                         *inRefCon,
 // Move the audio files from tmp directory to Document directory
 - (void)saveRecording:(NSString *)SongName
 {
-    NSError *error;
-    NSFileManager *fileMgr = [NSFileManager defaultManager];
+    NSError* error;
     
-    NSArray *dirPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask, YES);
-    NSString *docsDir =dirPaths[0];
-    NSString *tmpDir = NSTemporaryDirectory();
-    NSLog(@"doc path: %@", docsDir);
-    NSLog(@"tmp path: %@", tmpDir);
-    
-    NSString *tmpOriginalFile = [tmpDir stringByAppendingString:@"audioOriginal.wav"];
-    NSString *tmpFramesFile = [tmpDir stringByAppendingString:@"audioFrames.wav"];
+    NSString *tmpOriginalFile = [_tmpDir stringByAppendingString:@"audioOriginal.wav"];
+    NSString *tmpFramesFile = [_tmpDir stringByAppendingString:@"audioFrames.wav"];
     
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setDateFormat:@"yyyyMMdd_HHmm"];
@@ -540,19 +543,19 @@ static OSStatus	performRender (void                         *inRefCon,
     FramesDocFileName = [FramesDocFileName stringByAppendingString:strNow];
     FramesDocFileName = [FramesDocFileName stringByAppendingString:@".wav"];
 
-    NSString *docOriginalFile = [docsDir stringByAppendingString:@"/"];
+    NSString *docOriginalFile = [_docsDir stringByAppendingString:@"/"];
     docOriginalFile = [docOriginalFile stringByAppendingString:OriginalDocFileName];
-    NSString *docFramesFile = [docsDir stringByAppendingString:@"/"];
+    NSString *docFramesFile = [_docsDir stringByAppendingString:@"/"];
     docFramesFile = [docFramesFile stringByAppendingString:FramesDocFileName];
     
-    if([fileMgr moveItemAtPath:tmpOriginalFile toPath:docOriginalFile error:&error])
+    if([_fileMgr moveItemAtPath:tmpOriginalFile toPath:docOriginalFile error:&error])
         NSLog(@"Yes, files are moved to %@", docOriginalFile);
     else
     {
         NSLog(@"No, files are not moved to %@", docOriginalFile);
         NSLog(@"No, error is %@", error);
     }
-    if([fileMgr moveItemAtPath:tmpFramesFile toPath:docFramesFile error:&error])
+    if([_fileMgr moveItemAtPath:tmpFramesFile toPath:docFramesFile error:&error])
         NSLog(@"Yes, files are moved to %@", docFramesFile);
     else
     {

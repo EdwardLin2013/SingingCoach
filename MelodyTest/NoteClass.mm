@@ -15,25 +15,31 @@
        withLength:(float)length
      withLocation:(float)yLocation
 {
+    if (self = [super init])
+    {
+        _pitch = pitch;
+        _NoteShape = Note;
+        _length = length;
+        _yLocation = yLocation;
+    }
     
-    _pitch = pitch;
-    _NoteShape = Note;
-    _length = length;
-    _yLocation = yLocation;
     return self;
-    
 }
 
--(SKSpriteNode*) getNoteShape{
+-(SKSpriteNode*) getNoteShape
+{
     return _NoteShape;
 }
--(float)getLength{
+-(float)getLength
+{
     return _length;
 }
--(NSString*)getPitch{
+-(NSString*)getPitch
+{
     return _pitch;
 }
--(float)getyLocation{
+-(float)getyLocation
+{
     return _yLocation;
 }
 

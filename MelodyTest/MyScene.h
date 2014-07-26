@@ -36,14 +36,14 @@
     int                 _octaveValue; // the value of one octave : 12
     float               _speed; //the speed (pixels/second) of the notes
     CGSize              _framesize; // self.frame.size
-    NSMutableArray     *_StringInput;// the input string of notes
-    NSMutableArray     *_NoteInput; // the array contaning the input NoteClass from stringinput
-    NSMutableArray     *_NoteOutput; // the array containing notes that are currently rendered in the screen
-    NoteClass          *_CurrentNode; //the node that is processed to come out
-    NoteClass          *_FrontNode; // the first node in the note output array, that havent left the screen
-    NoteClass          *_HittingNode; // the first node that havent hit the bar
-    NoteClass          *_SparkledNode; // the first node that havent hit the bar and havent sparked
-    SKSpriteNode       *_NoteBox;
+    NSMutableArray*     _StringInput;// the input string of notes
+    NSMutableArray*     _NoteInput; // the array contaning the input NoteClass from stringinput
+    NSMutableArray*     _NoteOutput; // the array containing notes that are currently rendered in the screen
+    NoteClass*          _CurrentNode; //the node that is processed to come out
+    NoteClass*          _FrontNode; // the first node in the note output array, that havent left the screen
+    NoteClass*          _HittingNode; // the first node that havent hit the bar
+    NoteClass*          _SparkledNode; // the first node that havent hit the bar and havent sparked
+    SKSpriteNode*       _NoteBox;
     //detach the noteoutput from parents when it has crossed finish the scoreline
     float               _buffer; //for the bars delay
     float               _tempo;//PARAM
@@ -51,10 +51,9 @@
     float               _oneBeatLength; // the length in pixel, of a beat
     
     // FOR ARROWS
-    CGMutablePathRef    _pathToDraw; //paths of the arrow tails
-    SKShapeNode        *_lineNode; //the node that will draw the pathToDraw each update
-    SKSpriteNode       *_Arrow; //the arrow node
-    NSMutableArray     *_paths; //the array of points to form pathToDraw
+    SKShapeNode*        _lineNode; //the node that will draw the pathToDraw each update
+    SKSpriteNode*       _Arrow; //the arrow node
+    NSMutableArray*     _paths; //the array of points to form pathToDraw
     float               _moveBy; //the speed of the tail generation
     float               _starting; //the starting location of a path generation
     float               _offset; // the offset from the middle of the arrow to to end of the arrow
@@ -63,21 +62,21 @@
     double              _loading; //PARAM
     
     //For pause menu
-    SKSpriteNode       *_pause; // the pause node
-    SKSpriteNode       *_PauseOverlay; // the pause info overlay node
+    SKSpriteNode*       _pause; // the pause node
+    SKSpriteNode*       _PauseOverlay; // the pause info overlay node
     int                 _isPausedScene; //state to indicate whether or not game is paused
     
     //For save recording
-    SKSpriteNode       *_SaveRecordingOverlay; // the save recording decision overlay node
+    SKSpriteNode*       _SaveRecordingOverlay; // the save recording decision overlay node
     
     //For song over
     int                 _songIsOver; //state to indicate whether or not song is over
-    SKSpriteNode       *_songOver; // the node that is going to be rendered when song is over
+    SKSpriteNode*       _songOver; // the node that is going to be rendered when song is over
     
     //param
-    NSString           *_songName; // the song name to be played in the BG
+    NSString*           _songName; // the song name to be played in the BG
     float               _delay; // amount of time in seconds for the song to play wrt loading time
-    NSString           *_pianoName; // the name of the piano file to render
+    NSString*           _pianoName; // the name of the piano file to render
     
     int                 _checkPitch; //for times checking pitch
 
@@ -85,6 +84,7 @@
 }
 
 @property (nonatomic, strong) AVAudioPlayer* player;
+
 -(id)initWithSize:(CGSize)size
      withSongName:(NSString*)songName
         withTempo: (float)tempoInput
@@ -92,4 +92,19 @@
         withInput: (NSMutableArray*)input
        withC3YPos: (float)C3Position
     withPianoName:(NSString*)pianoName;
+
+- (void)startPitch;
+- (void)startApp:(NSString*)pianoName;
+- (void)playMusic:(NSString*)SongName withShortStartDelay:(NSTimeInterval)shortStartDelay;
+- (void)MakeArrow;
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event;
+- (void)touchesMoved:(NSSet*)touches withEvent:(UIEvent*)event;
+- (int)getNoteDistance:(NSString*)noteName;
+- (void)loadNote;
+- (void)unloadNote;
+- (void)clashCheck;
+- (void)ArrowMove;
+- (void)pitchUpdate;
+
+
 @end

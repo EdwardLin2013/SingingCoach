@@ -42,6 +42,10 @@
     AudioFileID                 _FramesFile;
     BOOL                        _isRecording;   //FIXME: semaphore?
     CAStreamBasicDescription    _ioFormat;
+    
+    NSFileManager*              _fileMgr;
+    NSString*                   _docsDir;
+    NSString*                   _tmpDir;
 }
 
 /* -----------------------------Public Methods--------------------------------- Begin */
@@ -50,6 +54,9 @@
 - (OSStatus)stopIOUnit;
 - (void)EstimatePitch;
 - (NSString*)CurrentPitch;
+- (UInt32)getFrameSize;
+- (double)sessionSampleRate;
+- (BOOL)audioChainIsBeingReconstructed;
 /* -----------------------------Public Methods--------------------------------- End */
 
 /* -----------------------------Private Methods--------------------------------- Begin */
@@ -64,16 +71,13 @@
 - (Float32)freqToMIDI:(Float32)frequency;
 - (NSString*)midiToPitch:(Float32)midiNote;
 
-// Obsolete Functions or Functions which need improvement
-- (UInt32)getFrameSize;
-- (double)sessionSampleRate;
-- (BOOL)audioChainIsBeingReconstructed;
-
+// Audio Recording
 - (void)startRecording;
 - (void)stopRecording;
 - (BOOL)isRecording;
 - (void)GetFFTOutput:(Float32*)outFFTData;
 
+// File Management
 - (void)removeTmpFiles;
 - (void)saveRecording:(NSString *)SongName;
 /* -----------------------------Private Methods--------------------------------- End */
