@@ -314,21 +314,27 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay{
         }}
     else if (_songIsOver == 1)
     {
-        CGRect SaveRecording = CGRectMake(173, 320-184, 91, 26);
-        CGRect DontSaveRecording = CGRectMake(313, 320-184, 91, 26);
+        CGRect SaveRecording = CGRectMake(173, 320-170, 91, 26);
+        CGRect DontSaveRecording = CGRectMake(313, 320-170, 91, 26);
         
         if (CGRectContainsPoint(SaveRecording, location))
-            [_audioController saveRecording:_songName];
+        {  [_audioController saveRecording:_songName];
+            // change the UI
+            [_SaveRecordingOverlay removeFromParent];
+            [self addChild:_songOver];
+            _songIsOver = 2;
+        }
         else if (CGRectContainsPoint(DontSaveRecording, location))
         {
             // delete the recording in the tmp directory
             [_audioController removeTmpFiles];
+            // change the UI
+            [_SaveRecordingOverlay removeFromParent];
+            [self addChild:_songOver];
+            _songIsOver = 2;
         }
         
-        // change the UI
-        [_SaveRecordingOverlay removeFromParent];
-        [self addChild:_songOver];
-        _songIsOver = 2;
+
     }
     else if (_songIsOver == 2){
         [_songOver removeFromParent];
