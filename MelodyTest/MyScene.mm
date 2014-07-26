@@ -330,7 +330,8 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
         CGRect DontSaveRecording = CGRectMake(313, 320-170, 91, 26);
         
         if (CGRectContainsPoint(SaveRecording, location))
-        {  [_audioController saveRecording:_songName];
+        {
+            [_audioController saveRecording:_songName];
             // change the UI
             [_SaveRecordingOverlay removeFromParent];
             [self addChild:_songOver];
@@ -345,8 +346,6 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
             [self addChild:_songOver];
             _songIsOver = 2;
         }
-        
-
     }
     else if (_songIsOver == 2)
     {
@@ -633,7 +632,11 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
     //Check if self is paused
     if (self.view.isPaused == YES)
     {
-        //Do not update anything
+        //Do not update anything if song is paused
+    }
+    else if (_songIsOver != 0)
+    {
+        //Do not update anything if song is over
     }
     else
     {
