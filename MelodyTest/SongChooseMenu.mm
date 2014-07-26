@@ -205,7 +205,6 @@
                 [listArray removeObjectAtIndex:0];
                 SKScene *customSongScene = [[MyScene alloc]initWithSize:self.size withSongName:songName withTempo:tempo withDelay:delay withInput:listArray withC3YPos:C3YPos withPianoName:pianoName];
                 customSongScene.scaleMode = SKSceneScaleModeAspectFill;
-                NSLog(@"yay!");
                 [self.view presentScene:customSongScene transition:[SKTransition fadeWithDuration:1.5f]];
             }
     

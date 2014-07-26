@@ -564,7 +564,10 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay{
     
     //Check if self is paused
     if (self.view.isPaused == YES){
-        //Do not update anything
+        //Do not update anything if song is paused
+    }
+    else if (_songIsOver != 0){
+        //Do not update anything if song is over
     }
     else{
         
