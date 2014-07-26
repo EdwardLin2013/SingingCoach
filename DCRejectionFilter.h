@@ -1,9 +1,9 @@
 //
 //  DCRejectionFilter.h
-//  SingingPitchCoach
+//  TheSingingCoach
 //
-//  Created by Edward on 22/7/14.
-//  Copyright (c) 2014 Edward. All rights reserved.
+//  Created by Edward and Natalie on 22/7/14.
+//  Copyright (c) 2014 Edward and Natalie. All rights reserved.
 //
 #ifndef __DCRejectionFilter__
 #define __DCRejectionFilter__

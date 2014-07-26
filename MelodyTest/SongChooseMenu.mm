@@ -1,18 +1,16 @@
 //
-//  SongChooseMenu.m
-//  MelodyTest
+//  SongChooseMenu.mm
+//  TheSingingCoach
 //
-//  Created by CrimsonLycans on 12/7/14.
-//  Copyright (c) 2014 CrimsonLycans. All rights reserved.
+//  Created by Natalie and Edward on 11/6/14.
+//  Copyright (c) 2014 Natalie and Edward. All rights reserved.
 //
-
 #import "SongChooseMenu.h"
 
 @implementation SongChooseMenu
 
 -(id)initWithSize:(CGSize)size
 {
-    
     if (self = [super initWithSize:size])
     {
         _scaleH = size.height / 320;
@@ -62,15 +60,12 @@
         _FileNotFound.position = CGPointMake(0, 0);
         _FileNotFound.xScale = _scaleW;
         _FileNotFound.yScale = _scaleH;
-        
-        
     }
     return self;
 }
 
 -(void) setupTextField
 {
-    
     _textField = [[UITextField alloc]initWithFrame:[self fieldRect]];
     _textField.backgroundColor = [UIColor clearColor];
     _textField.textColor = [UIColor blackColor];
@@ -97,15 +92,17 @@
     [_textField resignFirstResponder];
     //Check the file error
     //File error page
-    
-    NSString *fileName = _textField.text;
-    NSString *filepath = [[NSBundle mainBundle] pathForResource:fileName ofType:@"txt"];
     NSError *error;
-    NSString *fileContents = [NSString stringWithContentsOfFile:filepath encoding:NSUTF8StringEncoding error:&error];
+    NSArray* dirPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask, YES);
+    NSString* docsDir = [dirPaths[0] stringByAppendingString:@"/"];
+    NSString* filePath = [[docsDir stringByAppendingString:_textField.text] stringByAppendingString:@".txt"];
+    NSString *fileContents = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:&error];
     
     if (error)
     {
         NSLog(@"Error reading file: %@", error.localizedDescription);
+        NSLog(@"filePath: %@", filePath);
+        
         _fileNotFound = 1;
         [_textField removeFromSuperview];
         [self addChild:_FileNotFound];
@@ -114,7 +111,9 @@
     {
         //Create the custom song scene here
         [_textField removeFromSuperview];
-       // NSLog(fileContents);
+        
+        //NSLog(fileContents);
+        
         NSMutableArray *listArray = [NSMutableArray arrayWithArray:[fileContents componentsSeparatedByString:@"\n"]];
         NSString *pianoName = [listArray objectAtIndex:0];
         [listArray removeObjectAtIndex:0];
@@ -123,13 +122,19 @@
         [listArray removeObjectAtIndex:0];
         NSString *songName = [listArray objectAtIndex:0];
         [listArray removeObjectAtIndex:0];
-     //   NSLog(songName);
+     
+        //NSLog(songName);
+        
         NSString *tempoString = [listArray objectAtIndex:0];
-      //  NSLog(tempoString);
+      
+        //NSLog(tempoString);
+        
         float tempo = [tempoString floatValue];
         [listArray removeObjectAtIndex:0];
         NSString *delayString = [listArray objectAtIndex:0];
-      //  NSLog(delayString);
+      
+        //NSLog(delayString);
+        
         float delay = [delayString floatValue];
         [listArray removeObjectAtIndex:0];
         SKScene *customSongScene = [[MyScene alloc]initWithSize:self.size withSongName:songName withTempo:tempo withDelay:delay withInput:listArray withC3YPos:C3YPos withPianoName:pianoName];
@@ -137,8 +142,6 @@
         
         [self.view presentScene:customSongScene transition:[SKTransition fadeWithDuration:1.5f]];
     }
-
-    
 }
 
 
@@ -155,33 +158,27 @@
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
     CGPoint location =[ [touches anyObject] locationInNode:self];
-    NSError *err;
-    NSString *path  = [[NSBundle mainBundle] pathForResource:@"button" ofType:@"mp3"];
-    NSURL *url = [NSURL fileURLWithPath:path];
+    NSError* err;
+    NSString* path  = [[NSBundle mainBundle] pathForResource:@"button" ofType:@"mp3"];
+    NSURL* url = [NSURL fileURLWithPath:path];
     _player = [[AVAudioPlayer alloc] initWithContentsOfURL:url error:&err];
     
     if (_fileNotFound == 0)
     {
-
         if (_cusSongState == 0)
         {
             CGRect Chandelier = CGRectMake(78*_scaleW,( 320-62)*_scaleH, 323*_scaleW, 64*_scaleH);
             CGRect ChandelierListen = CGRectMake(400*_scaleW, (320-60)*_scaleH,60*_scaleW,60*_scaleH);
-            NSString *ChandelierPath  = [[NSBundle mainBundle] pathForResource:@"chandelier" ofType:@"mp3"];
-            NSURL *ChandelierURL = [NSURL fileURLWithPath:ChandelierPath];
+            NSString* ChandelierPath = [[NSBundle mainBundle] pathForResource:@"chandelier" ofType:@"mp3"];
+            NSURL* ChandelierURL = [NSURL fileURLWithPath:ChandelierPath];
     
             CGRect CustomSong = CGRectMake(78*_scaleW, (320-126)*_scaleH, 323*_scaleW, 64*_scaleH);
             CGRect exitButton = CGRectMake(0*_scaleW, (320-86)*_scaleH, 74*_scaleW  , 86*_scaleH);
 
-    
             if (CGRectContainsPoint(Chandelier, location))
             {
-        
-
                 if (err)
-                {
                     NSLog (@"Cannot Load audio");
-                }
                 else
                 {
                     [_player play];
@@ -201,40 +198,40 @@
                         [_textField removeFromSuperview];
                         [self addChild:_FileNotFound];
                     }
-            
                     else
                     {
                         //Create the custom song scene here
-                        NSMutableArray *listArray = [NSMutableArray arrayWithArray:[fileContents componentsSeparatedByString:@"\n"]];
-                        NSString *pianoName = [listArray objectAtIndex:0];
+                        NSMutableArray* listArray = [NSMutableArray arrayWithArray:[fileContents componentsSeparatedByString:@"\n"]];
+                        NSString* pianoName = [listArray objectAtIndex:0];
                         [listArray removeObjectAtIndex:0];
-                        NSString *C3position = [listArray objectAtIndex:0];
+                        NSString* C3position = [listArray objectAtIndex:0];
                         float C3YPos = [C3position floatValue];
                         [listArray removeObjectAtIndex:0];
-                        NSString *songName = [listArray objectAtIndex:0];
+                        NSString* songName = [listArray objectAtIndex:0];
                         [listArray removeObjectAtIndex:0];
-                        NSString *tempoString = [listArray objectAtIndex:0];
+                        NSString* tempoString = [listArray objectAtIndex:0];
                         float tempo = [tempoString floatValue];
                         [listArray removeObjectAtIndex:0];
-                        NSString *delayString = [listArray objectAtIndex:0];
+                        NSString* delayString = [listArray objectAtIndex:0];
                         float delay = [delayString floatValue];
                         [listArray removeObjectAtIndex:0];
-                        SKScene *customSongScene = [[MyScene alloc]initWithSize:self.size withSongName:songName withTempo:tempo withDelay:delay withInput:listArray withC3YPos:C3YPos withPianoName:pianoName];
+                        SKScene* customSongScene = [[MyScene alloc]initWithSize:self.size
+                                                                   withSongName:songName
+                                                                      withTempo:tempo
+                                                                      withDelay:delay
+                                                                      withInput:listArray
+                                                                     withC3YPos:C3YPos
+                                                                  withPianoName:pianoName];
                         customSongScene.scaleMode = SKSceneScaleModeAspectFill;
                         [self.view presentScene:customSongScene transition:[SKTransition fadeWithDuration:1.5f]];
                     }
-    
-                    
                 }
             }
             else if (CGRectContainsPoint(ChandelierListen, location) && _listenButtonChandelierState == 0)
             {
                 _listen = [[AVAudioPlayer alloc]initWithContentsOfURL:ChandelierURL error:&err];
                 if (err)
-                {
                     NSLog(@"Cannot load audio");
-            
-                }
                 else
                 {
                     _listenButtonChandelierState = 1;
@@ -273,9 +270,7 @@
             else if(CGRectContainsPoint(exitButton, location))
             {
                 if(err)
-                {
                     NSLog(@"Cannot load audio.");
-                }
                 else
                 {
                     [_player play];
@@ -298,10 +293,8 @@
         
         else
         {
-        
             CGRect exitCusSong = CGRectMake(337, 320-198, 83, 23);
-       
-        
+            
             if (CGRectContainsPoint(exitCusSong, location))
             {
                 _cusSongState = 0;
@@ -309,7 +302,6 @@
                 [_customSongOvr removeFromParent];
                 [_textField removeFromSuperview];
             }
-        
         }
     }
     
