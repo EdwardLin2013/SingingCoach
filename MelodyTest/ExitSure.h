@@ -10,9 +10,9 @@
 #import <AVFoundation/AVFoundation.h>
 
 @interface ExitSure : SKScene{
-    AVAudioPlayer *_player;
-    double _scaleH;
-    double _scaleW;
+    AVAudioPlayer*  _player;
+    double          _scaleH;
+    double          _scaleW;
 }
 
 @end

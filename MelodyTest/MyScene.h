@@ -58,8 +58,8 @@
     float               _starting; //the starting location of a path generation
     float               _offset; // the offset from the middle of the arrow to to end of the arrow
     
-    double              _currTime; //the time when the scene is just started (init)
-    double              _loading; //PARAM
+    double              _currTime;                          // the time when the scene is just started (init)
+    double              _loading;                           // number of seconds before notes are rendered to screen
     
     //For pause menu
     SKSpriteNode*       _pause; // the pause node
@@ -78,7 +78,7 @@
     float               _delay; // amount of time in seconds for the song to play wrt loading time
     NSString*           _pianoName; // the name of the piano file to render
     
-    int                 _checkPitch; //for times checking pitch
+    int                 _checkPitch;                        //for times checking pitch
 
 
 }

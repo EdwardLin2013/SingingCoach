@@ -14,9 +14,10 @@
 
 @implementation MainMenu
 
--(id)initWithSize:(CGSize)size {
-    if (self = [super initWithSize:size]) {
-        
+-(id)initWithSize:(CGSize)size
+{
+    if (self = [super initWithSize:size])
+    {
         SKSpriteNode *BG  = [SKSpriteNode spriteNodeWithImageNamed:@"MainMenuPic.png"];
         BG.anchorPoint = CGPointMake(0,0);
         BG.position = CGPointMake(0, 0);
@@ -24,16 +25,18 @@
         [self addChild:BG];
         
     
-}
+    }
     return self;
 }
 
--(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event{
+-(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+{
     CGPoint location =[ [touches anyObject] locationInNode:self];
     CGRect SelectButton = CGRectMake(77, 320-144, 232 , 35 );
     CGRect exitButton = CGRectMake(0, 320-86, 74  , 86);
     
-    if (CGRectContainsPoint(SelectButton, location)){
+    if (CGRectContainsPoint(SelectButton, location))
+    {
         
         NSLog(@"Select song");
         SKScene * scene = [SongChooseMenu sceneWithSize:self.size];
@@ -43,16 +46,17 @@
         NSString *path  = [[NSBundle mainBundle] pathForResource:@"button" ofType:@"mp3"];
         NSURL *url = [NSURL fileURLWithPath:path];
         _ButtonSound = [[AVAudioPlayer alloc] initWithContentsOfURL:url error:&err];
-        if (err){
+        if (err)
+        {
             NSLog (@"Cannot Load audio");
         }
-        else{
+        else
+        {
             [_ButtonSound play];
 
             NSLog(@"ButtonClicked!");
 
         }
-        
 
         [self.view presentScene:scene transition:[SKTransition fadeWithDuration:1.5]];
     }
@@ -64,10 +68,12 @@
         NSString *path  = [[NSBundle mainBundle] pathForResource:@"button" ofType:@"mp3"];
         NSURL *url = [NSURL fileURLWithPath:path];
         _ButtonSound = [[AVAudioPlayer alloc] initWithContentsOfURL:url error:&err];
-        if (err){
+        if (err)
+        {
             NSLog (@"Cannot Load audio");
         }
-        else{
+        else
+        {
             [_ButtonSound play];
 
             NSLog(@"Exit Button Clicked!");
@@ -84,7 +90,8 @@
     }
 }
 
--(void)update:(NSTimeInterval)currentTime{
+-(void)update:(NSTimeInterval)currentTime
+{
     
 }
 

@@ -15,20 +15,30 @@
 @interface SongChooseMenu : SKScene<UITextFieldDelegate>
 
 {
-    AVAudioPlayer *_player;
-    AVAudioPlayer *_listen;
+    AVAudioPlayer*  _player;
+    AVAudioPlayer*  _listen;
     
-    double _scaleH;
-    double _scaleW;
+    double          _scaleH;
+    double          _scaleW;
     
-    int _listenButtonChandelierState;//state whether chandelier listen button is pressed
-    SKSpriteNode *_ChandelierListenNode;
+    int             _listenButtonChandelierState;   //state whether chandelier listen button is pressed
+    SKSpriteNode*   _ChandelierListenNode;
     
-    SKSpriteNode *_customSongOvr;
-    int _cusSongState;//state whether customsong is pressed
+    SKSpriteNode*   _customSongOvr;
+    int             _cusSongState;                  //state whether customsong is pressed
     
-    UITextField *_textField;
-    int fileNotFound;//state whether file is found
-    SKSpriteNode *FileNotFound;
+    UITextField*    _textField;
+    int             _fileNotFound;                  //state whether file is found
+    SKSpriteNode*   _FileNotFound;
 }
+
+
+/* -----------------------------Private Methods--------------------------------- Begin */
+-(CGRect)fieldRect;
+-(void) processReturn;
+-(void) setupTextField;
+-(BOOL) textFieldShouldReturn:(UITextField *)theTextField;
+/* -----------------------------Private Methods--------------------------------- End */
+
+
 @end

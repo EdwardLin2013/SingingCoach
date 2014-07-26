@@ -326,28 +326,34 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
     }
     else if (_songIsOver == 1)
     {
-        CGRect SaveRecording = CGRectMake(173, 320-184, 91, 26);
-        CGRect DontSaveRecording = CGRectMake(313, 320-184, 91, 26);
+        CGRect SaveRecording = CGRectMake(173, 320-170, 91, 26);
+        CGRect DontSaveRecording = CGRectMake(313, 320-170, 91, 26);
         
         if (CGRectContainsPoint(SaveRecording, location))
-            [_audioController saveRecording:_songName];
+        {  [_audioController saveRecording:_songName];
+            // change the UI
+            [_SaveRecordingOverlay removeFromParent];
+            [self addChild:_songOver];
+            _songIsOver = 2;
+        }
         else if (CGRectContainsPoint(DontSaveRecording, location))
         {
             // delete the recording in the tmp directory
             [_audioController removeTmpFiles];
+            // change the UI
+            [_SaveRecordingOverlay removeFromParent];
+            [self addChild:_songOver];
+            _songIsOver = 2;
         }
         
-        // change the UI
-        [_SaveRecordingOverlay removeFromParent];
-        [self addChild:_songOver];
-        _songIsOver = 2;
+
     }
     else if (_songIsOver == 2)
     {
         [_songOver removeFromParent];
         
-        CGRect replay = CGRectMake(173, 320-184, 91, 26);
-        CGRect exitSong = CGRectMake(313, 320-184, 91, 26);
+        CGRect replay = CGRectMake(173, 320-171, 91, 26);
+        CGRect exitSong = CGRectMake(313, 320-171, 91, 26);
         
         if (CGRectContainsPoint(replay, location))
         {
@@ -392,7 +398,7 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
     
     NSString* oct = [noteName substringFromIndex:noteName.length-1];
     NSString* newNoteName = [noteName substringToIndex:noteName.length-1];
-    int difference = (oct.integerValue - 3)*_octaveValue;
+    int difference = ((int)(oct.integerValue) - 3)*_octaveValue;
     
     if ([newNoteName compare:@"C"]==0)
     {
@@ -669,7 +675,6 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
             if (_checkPitch%2 == 0)
             {
                 [self pitchUpdate];
-                
                 _checkPitch = 1;
             }
             else
