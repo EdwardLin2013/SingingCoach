@@ -19,17 +19,6 @@
     
     //For pitch app
 	AudioController*    _audioController;
-    BufferManager*      _bufferManager;
-    Float32*            _l_fftData;
-    Float32*            _l_cepstrumData;
-    Float32*            _l_fftcepstrumData;
-    UInt32              _Hz120;
-    UInt32              _Hz530;
-    Float32             _maxAmp;
-    int                 _bin;
-    Float32             _curAmp;
-    Float32             _frequency;
-    Float32             _midiNum;
     NSString*           _pitch;
     UInt32              _sampleRate;
     UInt32              _framesSize;
@@ -77,6 +66,9 @@
     SKSpriteNode       *_pause; // the pause node
     SKSpriteNode       *_PauseOverlay; // the pause info overlay node
     int                 _isPausedScene; //state to indicate whether or not game is paused
+    
+    //For save recording
+    SKSpriteNode       *_SaveRecordingOverlay; // the save recording decision overlay node
     
     //For song over
     int                 _songIsOver; //state to indicate whether or not song is over

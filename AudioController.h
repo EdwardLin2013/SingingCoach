@@ -36,10 +36,10 @@
     UInt32                      _Hz530;      // C5
     UInt32                      _Hz1100;     // C6
     
-    NSString*                   _FileNameWave;
-    NSString*                   _FileNameFFT;
-    AudioFileID                 _WaveFile;
-    AudioFileID                 _FFTFile;
+    NSString*                   _FileNameOriginal;      // Record the original Audio Wave
+    NSString*                   _FileNameFrames;        // Record the fragmentation
+    AudioFileID                 _OriginalFile;
+    AudioFileID                 _FramesFile;
     BOOL                        _isRecording;   //FIXME: semaphore?
     CAStreamBasicDescription    _ioFormat;
 }
@@ -65,7 +65,6 @@
 - (NSString*)midiToPitch:(Float32)midiNote;
 
 // Obsolete Functions or Functions which need improvement
-- (BufferManager*)getBufferManagerInstance;
 - (UInt32)getFrameSize;
 - (double)sessionSampleRate;
 - (BOOL)audioChainIsBeingReconstructed;
@@ -74,6 +73,9 @@
 - (void)stopRecording;
 - (BOOL)isRecording;
 - (void)GetFFTOutput:(Float32*)outFFTData;
-/* -----------------------------Private Methods--------------------------------- Begin */
+
+- (void)removeTmpFiles;
+- (void)saveRecording:(NSString *)SongName;
+/* -----------------------------Private Methods--------------------------------- End */
 
 @end
