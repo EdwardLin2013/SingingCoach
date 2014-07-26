@@ -13,7 +13,8 @@
 
 -(id)initWithSize:(CGSize)size
 {
-    if (self = [super initWithSize:size]) {
+    if (self = [super initWithSize:size])
+    {
         
         _scaleW = 568/self.frame.size.width;
         _scaleH = 320/self.frame.size.height;
@@ -30,11 +31,13 @@
     return self;
 }
 
--(void)update:(NSTimeInterval)currentTime{
+-(void)update:(NSTimeInterval)currentTime
+{
     
 }
 
--(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event{ 
+-(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+{
     NSError *err;
     NSString *path  = [[NSBundle mainBundle] pathForResource:@"button" ofType:@"mp3"];
     NSURL *url = [NSURL fileURLWithPath:path];
@@ -44,7 +47,9 @@
     CGRect yes = CGRectMake(188 * _scaleW, (320-184) * _scaleH   , 66 *_scaleW, 31 * _scaleH);
     
     CGRect no = CGRectMake(329 * _scaleW, (320-183)*_scaleH, 66 *_scaleW, 33 * _scaleH);
-    if(CGRectContainsPoint(yes, location)){
+    
+    if(CGRectContainsPoint(yes, location))
+    {
         NSLog(@"Yes, Quit!");
         exit(0);
     }

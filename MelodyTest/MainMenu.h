@@ -13,7 +13,7 @@
 
 @interface MainMenu : SKScene
 {
-    AVAudioPlayer *_ButtonSound;
+    AVAudioPlayer*  _ButtonSound;
 }
 
 
