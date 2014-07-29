@@ -362,7 +362,7 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
         {
             SKScene *replaySong = [[MyScene alloc]initWithSize:self.size withSongName:_songName withTempo:_tempo withDelay:_delay withInput:_StringInput withC3YPos:_C3Ypos withPianoName:_pianoName];
             replaySong.scaleMode = SKSceneScaleModeAspectFill;
-            NSlog(@"Replaying song");
+            NSLog(@"Replaying song");
             /* Stop the microphone */
             [_audioController stopIOUnit];
             _audioController = NULL;
