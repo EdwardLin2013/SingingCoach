@@ -384,7 +384,7 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
     }
     else if (_songIsOver > 1)
     {
-        [_songOver removeFromParent];
+
         
         CGRect replay = CGRectMake(173, 320-171, 91, 26);
         CGRect exitSong = CGRectMake(313, 320-171, 91, 26);
@@ -402,8 +402,8 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
             [_NoteInput removeAllObjects];
             [_NoteOutput removeAllObjects];
             [_paths removeAllObjects];
-            [_scoreValue removeFromParent];
-            
+
+
             [self.view presentScene:replaySong transition:[SKTransition crossFadeWithDuration:1.5]];
         }
         else if (CGRectContainsPoint(exitSong, location))
@@ -419,7 +419,7 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
             [_NoteInput removeAllObjects];
             [_NoteOutput removeAllObjects];
             [_paths removeAllObjects];
-            [_scoreValue removeFromParent];
+
             
             [self.view presentScene:songChoose transition:[SKTransition fadeWithDuration:1.5]];
             
