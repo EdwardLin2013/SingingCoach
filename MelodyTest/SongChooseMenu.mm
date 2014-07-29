@@ -16,6 +16,8 @@
         _scaleH = size.height / 320;
         _scaleW = size.width / 568;
         
+        _userDefs = [NSUserDefaults standardUserDefaults];
+        
         _cusSongState = 0;
         _listenButtonChandelierState = 0;
         _fileNotFound = 0;
@@ -90,8 +92,7 @@
 -(void) processReturn
 {
     [_textField resignFirstResponder];
-    //Check the file error
-    //File error page
+
     NSError *error;
     NSArray* dirPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask, YES);
     NSString* docsDir = [dirPaths[0] stringByAppendingString:@"/"];
@@ -113,7 +114,6 @@
         [_textField removeFromSuperview];
         
         //NSLog(fileContents);
-        
         NSMutableArray *listArray = [NSMutableArray arrayWithArray:[fileContents componentsSeparatedByString:@"\n"]];
         NSString *pianoName = [listArray objectAtIndex:0];
         [listArray removeObjectAtIndex:0];
@@ -177,6 +177,7 @@
 
             if (CGRectContainsPoint(Chandelier, location))
             {
+                [_userDefs setInteger:1 forKey:@"songType"];
                 if (err)
                     NSLog (@"Cannot Load audio");
                 else
@@ -200,7 +201,6 @@
                     }
                     else
                     {
-                        //Create the custom song scene here
                         NSMutableArray* listArray = [NSMutableArray arrayWithArray:[fileContents componentsSeparatedByString:@"\n"]];
                         NSString* pianoName = [listArray objectAtIndex:0];
                         [listArray removeObjectAtIndex:0];
@@ -284,6 +284,7 @@
     
             else if (CGRectContainsPoint(CustomSong, location))
             {
+                [_userDefs setInteger:0 forKey:@"songType"];
                 _cusSongState = 1;
                 [_player play];
                 [self addChild:_customSongOvr];

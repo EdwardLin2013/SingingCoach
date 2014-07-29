@@ -20,6 +20,8 @@
 {
     if (self = [super initWithSize:size])
     {
+        
+
         //Set Global variables based on input
         _C3Ypos = C3Position;
         _songName = songName;
@@ -47,7 +49,17 @@
             totalDelayTime = 0;
         }
         
-        [self playMusic:songName withShortStartDelay:totalDelayTime];
+        NSUserDefaults* userDefs = [NSUserDefaults standardUserDefaults];
+        NSInteger songType = [userDefs integerForKey:@"songType"];
+        
+        if(songType == 0){
+            [self playMusicCustom:songName withShortStartDelay:totalDelayTime];
+        }
+        else if (songType == 1){
+            [self playMusic:songName withShortStartDelay:totalDelayTime];
+        }
+        
+
         [self MakeArrow];
         
         _StringInput = input;
@@ -231,6 +243,26 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
     NSError *err;
     NSString *path  = [[NSBundle mainBundle] pathForResource:SongName ofType:@"mp3"];
     NSURL *url = [NSURL fileURLWithPath:path];
+    _player = [[AVAudioPlayer alloc] initWithContentsOfURL:url error:&err];
+    if (err)
+        NSLog (@"Cannot Load audio");
+    else
+    {
+        NSLog(@"succeed!");
+        [_player playAtTime:_currTime + shortStartDelay];
+    }
+}
+
+-(void)playMusicCustom:(NSString*)SongName
+withShortStartDelay:(NSTimeInterval)shortStartDelay
+{
+    
+    NSError *err;
+    NSArray* dirPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask, YES);
+    NSString* docsDir = [dirPaths[0] stringByAppendingString:@"/"];
+    NSString* filePath = [[docsDir stringByAppendingString:SongName] stringByAppendingString:@".mp3"];
+
+      NSURL *url = [NSURL fileURLWithPath:filePath];
     _player = [[AVAudioPlayer alloc] initWithContentsOfURL:url error:&err];
     if (err)
         NSLog (@"Cannot Load audio");

@@ -29,6 +29,8 @@
     UITextField*    _textField;
     int             _fileNotFound;                  //state whether file is found
     SKSpriteNode*   _FileNotFound;
+    
+    NSUserDefaults* _userDefs;
 }
 
 

@@ -34,11 +34,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "MelodyTest/MyScene.mm"
-            timestampString = "428321417.02767"
+            timestampString = "428329030.919935"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "692"
-            endingLineNumber = "692"
+            startingLineNumber = "724"
+            endingLineNumber = "724"
             landmarkName = "-update:"
             landmarkType = "5">
          </BreakpointContent>
