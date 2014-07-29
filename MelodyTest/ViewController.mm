@@ -1,11 +1,10 @@
 //
 //  ViewController.m
-//  MelodyTest
+//  TheSingingCoach
 //
-//  Created by CrimsonLycans on 11/6/14.
-//  Copyright (c) 2014 ___FULLUSERNAME___. All rights reserved.
+//  Created by Natalie and Edward on 11/6/14.
+//  Copyright (c) 2014 Natalie and Edward. All rights reserved.
 //
-
 #import "ViewController.h"
 #import "MyScene.h"
 #import "MainMenu.h"
@@ -17,20 +16,24 @@
 {
     [super viewWillLayoutSubviews];
 
+    [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationNone];
+    
     // Configure the view.
     SKView * skView = (SKView *)self.view;
-    if (!skView.scene){
-    skView.showsFPS = YES;
-    skView.showsNodeCount = YES;
+    if (!skView.scene)
+    {
+        skView.showsFPS = YES;
+        skView.showsNodeCount = YES;
     
-    // Create and configure the scene.
-    SKScene * scene = [MainMenu sceneWithSize:skView.bounds.size];
-    scene.scaleMode = SKSceneScaleModeAspectFill;
+        // Create and configure the scene.
+        SKScene * scene = [MainMenu sceneWithSize:skView.bounds.size];
+        scene.scaleMode = SKSceneScaleModeAspectFill;
     
         NSLog(@"width: %f", skView.bounds.size.width);
-        NSLog(@"height : %f", skView.bounds.size.height);
-    // Present the scene.
-    [skView presentScene:scene];
+        NSLog(@"height: %f", skView.bounds.size.height);
+    
+        // Present the scene.
+        [skView presentScene:scene];
     }
 }
 
