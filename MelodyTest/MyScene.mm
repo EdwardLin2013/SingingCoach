@@ -107,7 +107,6 @@
         _SparkledNode = [_NoteInput objectAtIndex:0];
         
     }
-    
     return self;
 }
 
@@ -127,6 +126,11 @@
 //Method for Song Player initialization
 -(void)startApp:(NSString*)pianoName
 {
+    _totalscoreArray = [[NSMutableArray alloc]init];
+    _scoreArray = [[NSMutableArray alloc]init];
+    _score = 0;
+    _totalscore = 0;
+    _SparkleIdx = 1;
     _checkPitch = 1; //Initial value of pitch checking
     _songIsOver = 0; //Exit or replay state
     _isPausedScene = 0; //Paused or not state
@@ -220,7 +224,6 @@
     _songOver.position = CGPointMake(0, 0);
     _songOver.zPosition = 10;
 }
-
 
 //Method to setup musicPlayer
 -(void)playMusic:(NSString*)SongName
@@ -345,9 +348,10 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
             [_SaveRecordingOverlay removeFromParent];
             [self addChild:_songOver];
             _songIsOver = 2;
+            
         }
     }
-    else if (_songIsOver == 2)
+    else if (_songIsOver > 1)
     {
         [_songOver removeFromParent];
         
@@ -358,15 +362,7 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
         {
             SKScene *replaySong = [[MyScene alloc]initWithSize:self.size withSongName:_songName withTempo:_tempo withDelay:_delay withInput:_StringInput withC3YPos:_C3Ypos withPianoName:_pianoName];
             replaySong.scaleMode = SKSceneScaleModeAspectFill;
-            [self.view presentScene:replaySong transition:[SKTransition crossFadeWithDuration:1.5]];
-        }
-        else if (CGRectContainsPoint(exitSong, location))
-        {
-            SKScene *songChoose = [SongChooseMenu sceneWithSize:self.size];
-            songChoose.scaleMode = SKSceneScaleModeAspectFill;
-            
-            [self.view presentScene:songChoose transition:[SKTransition fadeWithDuration:1.5]];
-            
+            NSlog(@"Replaying song");
             /* Stop the microphone */
             [_audioController stopIOUnit];
             _audioController = NULL;
@@ -375,6 +371,28 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
             [_NoteInput removeAllObjects];
             [_NoteOutput removeAllObjects];
             [_paths removeAllObjects];
+            [_scoreValue removeFromParent];
+            
+            [self.view presentScene:replaySong transition:[SKTransition crossFadeWithDuration:1.5]];
+        }
+        else if (CGRectContainsPoint(exitSong, location))
+        {
+            NSLog(@"Exiting song");
+            SKScene *songChoose = [SongChooseMenu sceneWithSize:self.size];
+            songChoose.scaleMode = SKSceneScaleModeAspectFill;
+            /* Stop the microphone */
+            [_audioController stopIOUnit];
+            _audioController = NULL;
+            
+            [_StringInput removeAllObjects];
+            [_NoteInput removeAllObjects];
+            [_NoteOutput removeAllObjects];
+            [_paths removeAllObjects];
+            [_scoreValue removeFromParent];
+            
+            [self.view presentScene:songChoose transition:[SKTransition fadeWithDuration:1.5]];
+            
+
         }
     }
 }
@@ -390,7 +408,6 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
 //Method to calculate noteDistance based on the pitch of the note. All calculation is based on relative to C3 note,
 //Hence the C3 yPosition needs to be the parameter of this class.
 //All invalid note pitch format will be treated as C3 note
-
 -(int)getNoteDistance:(NSString*)noteName
 {
     int answer = 0;
@@ -493,7 +510,6 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
 }
 
 //Method called by Update to remove notes from the screen as soon as they have finished travelling the whole width of screen
-
 -(void)unloadNote
 {
     NoteClass *toRemoveNode = [_NoteOutput objectAtIndex:0];
@@ -508,6 +524,9 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
         [self addChild:_SaveRecordingOverlay];
         _songIsOver = 1;
     }
+
+
+    
 }
 
 
@@ -521,35 +540,51 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
     float barMax = CGRectGetMaxX(bar.frame);
     float noteMin = CGRectGetMinX(clash.frame);
     float barMin = CGRectGetMinX(bar.frame);
+    float noteMax = CGRectGetMaxX(clash.frame);
+    float range = [_HittingNode getyLocation];
+    float mylength = clash.frame.size.width;
     
-    /*
-     if (barMin < noteMin && noteMin < barMax && [pitchHitNode compare:@"rest"] != 0){
-     if (_firstColision == 0){
-     _firstColision = 1;
-     double time = CACurrentMediaTime();
-     double timeDelay = time - currTime;
-     printf("\n first collision time %f", timeDelay);
-     
+    //hit first Half a note to score full marks
+    noteMax = noteMax - mylength /2;
+    
+     if (barMin > noteMin && noteMax > barMin && [pitchHitNode compare:@"rest"] != 0){
+         if (_firstColision == 0){
+             _firstColision = 1;
+             double time = CACurrentMediaTime();
+             double timeDelay = time - _currTime;
+             printf("\n first collision time %f", timeDelay);
+         }
+         
+         if (_Arrow.self.frame.origin.y <= range + 11 && _Arrow.self.frame.origin.y>=range){
+             _score++;
+         }
+         _totalscore ++;
+
+     }
+    
+     else if ((noteMax < barMin && _idx < _NoteInput.count) || ([pitchHitNode compare:@"rest"] == 0 && _idx < _NoteInput.count)){
+         
+         [_scoreArray addObject:[NSNumber numberWithInt:_score]];
+         [_totalscoreArray addObject:[NSNumber numberWithInt:_totalscore]];
+         
+         _score = 0;
+         _totalscore = 0;
+         
+         _HittingNode = [_NoteInput objectAtIndex:_idx];
+         _idx++;
+         
      }
      
-     
-     //  printf("Arrow is at : %f \n",Arrow.self.frame.origin.y);
-     
-     }
-     else if ((noteMin < barMin && _idx < NoteInput.count) || ([pitchHitNode compare:@"rest"] == 0 && _idx < NoteInput.count)){
-     HittingNode = [NoteInput objectAtIndex:_idx];
-     _idx++;
-     }
-     
-     */
+    
     //Special effects of clashing
     
     NSString *pitchHitNodeSpark = [_SparkledNode getPitch];
     SKSpriteNode *spark = [_SparkledNode getNoteShape];
     float noteMinSpark = CGRectGetMinX(spark.frame);
     
-    if(barMin < noteMinSpark && noteMinSpark < barMax && _idx< _NoteInput.count && [pitchHitNodeSpark compare:@"rest"] != 0)
+    if(barMin < noteMinSpark && noteMinSpark < barMax && _SparkleIdx< _NoteInput.count && [pitchHitNodeSpark compare:@"rest"] != 0)
     {
+ 
         SKEmitterNode *explosionTwo = [NSKeyedUnarchiver unarchiveObjectWithFile:[[NSBundle mainBundle] pathForResource:@"explode" ofType:@"sks"]];
         [explosionTwo setNumParticlesToEmit:35];
         explosionTwo.position = CGPointMake(_scoreBarXpos, [_SparkledNode getyLocation] + 5);
@@ -557,16 +592,24 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
         explosionTwo.xScale = 0.5;
         explosionTwo.yScale = 0.3;
         [self addChild:explosionTwo];
+        _SparkledNode = [_NoteInput objectAtIndex:_SparkleIdx];
+        if (_SparkleIdx < _NoteInput.count-1)
+        {
+        _SparkleIdx++;
+        }
         
-        _SparkledNode = [_NoteInput objectAtIndex:_idx];
-        _idx++;
         
         
     }
-    else if ([pitchHitNodeSpark compare:@"rest"] == 0 && _idx < _NoteInput.count)
+    else if ([pitchHitNodeSpark compare:@"rest"] == 0 && _SparkleIdx < _NoteInput.count)
+        
     {
-        _SparkledNode = [_NoteInput objectAtIndex:_idx];
-        _idx++;
+
+        _SparkledNode = [_NoteInput objectAtIndex:_SparkleIdx];
+        if (_SparkleIdx < _NoteInput.count-1)
+        {
+        _SparkleIdx++;
+        }
     }
 }
 
@@ -603,7 +646,7 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
         //add all the lines to the new path
         CGPathAddLineToPoint(pathToDraw, NULL, tempPt.x, tempPt.y);
     }
-
+    
     //make a copy of the new path and plug in to lineNode
     _lineNode.path = pathToDraw;
     CGPathRelease(pathToDraw);
@@ -634,9 +677,41 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
     {
         //Do not update anything if song is paused
     }
-    else if (_songIsOver != 0)
+    else if(_songIsOver == 1){
+        //Do note update anything
+    }
+    //score calculation
+    else if (_songIsOver == 2 )
     {
-        //Do not update anything if song is over
+        double scoreEarned = 0;
+        double totalAllScore = 0;
+        for (int i = 0; i<_scoreArray.count;i++){
+            NSNumber *number = [_scoreArray objectAtIndex:i];
+            NSNumber *numberTotal = [_totalscoreArray objectAtIndex:i];
+            double numberDouble = [number doubleValue];
+            double numberTotalDouble = [numberTotal doubleValue];
+            double divisionResult = numberDouble / numberTotalDouble;
+            if (divisionResult >= 0.5){
+                numberDouble = numberTotalDouble;
+            }
+            scoreEarned = scoreEarned + numberDouble;
+            totalAllScore = totalAllScore + numberTotalDouble;
+        }
+
+        double finalScore = scoreEarned/totalAllScore * 100;
+        
+        _scoreValue = [SKLabelNode labelNodeWithFontNamed:@"IowanOldStyle-Roman"];
+        _scoreValue.text = [NSString stringWithFormat:@"%f", finalScore];
+        _scoreValue.fontSize = 20;
+        _scoreValue.fontColor = [UIColor blackColor];
+        _scoreValue.position = CGPointMake(325, 320-135);
+        _scoreValue.zPosition = 11;
+        [self addChild:_scoreValue];
+
+        _songIsOver = 3;
+    }
+    else if (_songIsOver == 3){
+        //Do nothing
     }
     else
     {
@@ -665,15 +740,15 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
             if (location < nextNode && _index < _NoteInput.count)
                 [self loadNote];
             
+            //Do ClashCheck
+            [self clashCheck];
+            
             //Do Note unloading
             SKSpriteNode *frntNode = [_FrontNode getNoteShape];
             float myLocation = frntNode.frame.origin.x;
             if (myLocation <= 0 - (frntNode.self.frame.size.width) && _NoteOutput.count > 1)
                 [self unloadNote];
-            
-            //Do ClashCheck
-            [self clashCheck];
-            
+        
             //Do Pitch Detection
             if (_checkPitch%2 == 0)
             {

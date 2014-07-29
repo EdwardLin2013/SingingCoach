@@ -27,6 +27,7 @@
     int                 _statusGo;                          // The state whether loading has finished and whether program can start loading node.
     int                 _firstColision;                     // The state whether first collision with scorebar has occured
     int                 _idx;                               // For clash checking, idx ++ as soon as clash ends
+    int                 _SparkleIdx;                        // For sparkling notes
     int                 _index;                             // for Loadnote, index ++ as soon as previous node left the screen
     float               _C3Ypos;                            // the position of C3 note
     float               _octaveLength;                      // the length of 1 octave in pixels
@@ -79,7 +80,12 @@
     
     int                 _checkPitch;                        //for times checking pitch
 
-
+    //For scoring
+    int                 _score;
+    int                 _totalscore;
+    NSMutableArray*     _scoreArray;
+    NSMutableArray*     _totalscoreArray;
+    SKLabelNode*        _scoreValue;
 }
 
 @property (nonatomic, strong) AVAudioPlayer* player;
