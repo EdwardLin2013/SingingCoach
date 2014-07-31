@@ -8,7 +8,8 @@
 #import <SpriteKit/SpriteKit.h>
 #import "SongChooseMenu.h"
 #import <AVFoundation/AVFoundation.h>
-
+#import "ExitSure.h"
+#import "HighScorePage.h"
 
 @interface MainMenu : SKScene
 {

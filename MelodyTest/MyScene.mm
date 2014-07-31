@@ -55,7 +55,7 @@
         if(songType == 0){
             [self playMusicCustom:songName withShortStartDelay:totalDelayTime];
         }
-        else if (songType == 1){
+        else{
             [self playMusic:songName withShortStartDelay:totalDelayTime];
         }
         
@@ -360,8 +360,8 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
     }
     else if (_songIsOver == 1)
     {
-        CGRect SaveRecording = CGRectMake(173, 320-170, 91, 26);
-        CGRect DontSaveRecording = CGRectMake(313, 320-170, 91, 26);
+        CGRect SaveRecording = CGRectMake(173, 320-184, 91, 26);
+        CGRect DontSaveRecording = CGRectMake(313, 320-184, 91, 26);
         
         if (CGRectContainsPoint(SaveRecording, location))
         {
@@ -386,8 +386,8 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
     {
 
         
-        CGRect replay = CGRectMake(173, 320-171, 91, 26);
-        CGRect exitSong = CGRectMake(313, 320-171, 91, 26);
+        CGRect replay = CGRectMake(173, 320-184, 91, 26);
+        CGRect exitSong = CGRectMake(313, 320-184, 91, 26);
         
         if (CGRectContainsPoint(replay, location))
         {
@@ -739,7 +739,24 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
         _scoreValue.zPosition = 11;
         [self addChild:_scoreValue];
 
+        
+        //Saving score
+        NSUserDefaults* userDefs = [NSUserDefaults standardUserDefaults];
+        
+        NSInteger songType = [userDefs integerForKey:@"songType"];
+        NSString* HSstringToEnter = @"highScore";
+        NSString* songTypeString = [NSString stringWithFormat:@"%d", (int)songType];
+        HSstringToEnter = [HSstringToEnter stringByAppendingString:songTypeString];
+        double HS = [userDefs doubleForKey:HSstringToEnter];
+        
+        if (finalScore > HS){
+            [userDefs setDouble:finalScore forKey:HSstringToEnter];
+        }
+        
         _songIsOver = 3;
+        
+        
+        
     }
     else if (_songIsOver == 3){
         //Do nothing

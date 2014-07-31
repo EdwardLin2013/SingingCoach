@@ -6,11 +6,6 @@
 //  Copyright (c) 2014 Natalie and Edward. All rights reserved.
 //
 #import "MainMenu.h"
-#import "MyScene.h"
-#import "ExitSure.h"
-#import <AVFoundation/AVFoundation.h>
-
-
 @implementation MainMenu
 
 -(id)initWithSize:(CGSize)size
@@ -32,7 +27,14 @@
 {
     CGPoint location =[ [touches anyObject] locationInNode:self];
     CGRect SelectButton = CGRectMake(77, 320-144, 232 , 35 );
+    CGRect HighScoreButton = CGRectMake(79, 320-211, 230, 38);
     CGRect exitButton = CGRectMake(0, 320-86, 74  , 86);
+    
+    NSError *err;
+    NSString *path  = [[NSBundle mainBundle] pathForResource:@"button" ofType:@"mp3"];
+    NSURL *url = [NSURL fileURLWithPath:path];
+    _ButtonSound = [[AVAudioPlayer alloc] initWithContentsOfURL:url error:&err];
+
     
     if (CGRectContainsPoint(SelectButton, location))
     {
@@ -41,10 +43,6 @@
         SKScene * scene = [SongChooseMenu sceneWithSize:self.size];
         scene.scaleMode = SKSceneScaleModeAspectFill;
         
-        NSError *err;
-        NSString *path  = [[NSBundle mainBundle] pathForResource:@"button" ofType:@"mp3"];
-        NSURL *url = [NSURL fileURLWithPath:path];
-        _ButtonSound = [[AVAudioPlayer alloc] initWithContentsOfURL:url error:&err];
         if (err)
         {
             NSLog (@"Cannot Load audio");
@@ -63,10 +61,7 @@
     else if (CGRectContainsPoint(exitButton, location))
     {
         NSLog(@"EXIT GAME");
-        NSError *err;
-        NSString *path  = [[NSBundle mainBundle] pathForResource:@"button" ofType:@"mp3"];
-        NSURL *url = [NSURL fileURLWithPath:path];
-        _ButtonSound = [[AVAudioPlayer alloc] initWithContentsOfURL:url error:&err];
+        
         if (err)
         {
             NSLog (@"Cannot Load audio");
@@ -77,15 +72,31 @@
 
             NSLog(@"Exit Button Clicked!");
             
-            SKScene * scene = [ExitSure sceneWithSize:self.size];
+            SKScene* scene = [ExitSure sceneWithSize:self.size];
             scene.scaleMode = SKSceneScaleModeAspectFill;
             
             [self.view presentScene:scene transition:[SKTransition crossFadeWithDuration:0.2]];
             
             
         }
-  
-      
+    }
+    
+    else if (CGRectContainsPoint(HighScoreButton, location))
+    {
+        NSLog(@"Entering HighScore");
+        if (err)
+        {
+            NSLog(@"Cannot load audio");
+        }
+        else{
+            [_ButtonSound play];
+            
+            SKScene* scene =[HighScorePage sceneWithSize:self.size];
+            scene.scaleMode = SKSceneScaleModeAspectFill;
+            
+            [self.view presentScene:scene transition:[SKTransition fadeWithDuration:1.5f]];
+        }
+        
     }
 }
 
