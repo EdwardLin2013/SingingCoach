@@ -249,11 +249,11 @@
     _songOver.zPosition = 10;
     
     //Make scoring
-    _scoreValue = [SKLabelNode labelNodeWithFontNamed:@"IowanOldStyle-Roman"];
+    _scoreValue = [SKLabelNode labelNodeWithFontNamed:@"IowanOldStyle-Bold"];
     _scoreValue.text = [NSString stringWithFormat:@"Current Score: 0.00000"];
     _scoreValue.fontSize = 10;
     _scoreValue.fontColor = [UIColor blackColor];
-    _scoreValue.position = CGPointMake(508, 320-21);
+    _scoreValue.position = CGPointMake(508, 320-22);
     _scoreValue.zPosition = 11;
     [self addChild:_scoreValue];
 
@@ -751,7 +751,7 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
         
         printf("\n this is actualtotalscore : %f", totalAllScore);
         [_scoreValue removeFromParent];
-        _scoreValue = [SKLabelNode labelNodeWithFontNamed:@"IowanOldStyle-Roman"];
+        _scoreValue = [SKLabelNode labelNodeWithFontNamed:@"IowanOldStyle-Bold"];
         _scoreValue.fontSize = 20;
         _scoreValue.fontColor = [UIColor blackColor];
         _scoreValue.text = [NSString stringWithFormat:@"%f", finalScore];
@@ -868,11 +868,11 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
                     // printf("YES\n");
                     [_scoreValue removeFromParent];
                     double currentScore = (double)_myScore / (double)_predictedTotalScore * 100;
-                    _scoreValue = [SKLabelNode labelNodeWithFontNamed:@"IowanOldStyle-Roman"];
+                    _scoreValue = [SKLabelNode labelNodeWithFontNamed:@"IowanOldStyle-Bold"];
                     _scoreValue.text = [NSString stringWithFormat:@"Current Score: %f", currentScore];
                     _scoreValue.fontSize = 10;
                     _scoreValue.fontColor = [UIColor blackColor];
-                    _scoreValue.position = CGPointMake(508, 320-21);
+                    _scoreValue.position = CGPointMake(508, 320-22);
                     _scoreValue.zPosition = 11;
                     [self addChild:_scoreValue];
                     _scoreUpdate = 1;
