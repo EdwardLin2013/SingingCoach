@@ -11,9 +11,20 @@
 #import "ExitSure.h"
 #import "HighScorePage.h"
 
-@interface MainMenu : SKScene
+@interface MainMenu : SKScene<UITextFieldDelegate>
+
 {
     AVAudioPlayer*  _ButtonSound;
+    
+    SKLabelNode*    _PlayerName;
+    SKSpriteNode*   _PlayerNameOverlay;
+    
+    UITextField*    _textField;
+    NSUserDefaults* _userDefs;
+    
+    int             _PNstate;
+    SKLabelNode*    _PlayerNameText;
+    NSString*       _myName;
 }
 
 

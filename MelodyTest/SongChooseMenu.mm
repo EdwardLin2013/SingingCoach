@@ -93,54 +93,56 @@
 {
     [_textField resignFirstResponder];
 
-    NSError *error;
-    NSArray* dirPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask, YES);
-    NSString* docsDir = [dirPaths[0] stringByAppendingString:@"/"];
-    NSString* filePath = [[docsDir stringByAppendingString:_textField.text] stringByAppendingString:@".txt"];
-    NSString *fileContents = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:&error];
-    
-    if (error)
-    {
-        NSLog(@"Error reading file: %@", error.localizedDescription);
-        NSLog(@"filePath: %@", filePath);
+    if ([_textField.text compare:@""] != 0){
+        NSError *error;
+        NSArray* dirPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask, YES);
+        NSString* docsDir = [dirPaths[0] stringByAppendingString:@"/"];
+        NSString* filePath = [[docsDir stringByAppendingString:_textField.text] stringByAppendingString:@".txt"];
+        NSString *fileContents = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:&error];
         
-        _fileNotFound = 1;
-        [_textField removeFromSuperview];
-        [self addChild:_FileNotFound];
-    }
-    else
-    {
-        //Create the custom song scene here
-        [_textField removeFromSuperview];
-        
-        //NSLog(fileContents);
-        NSMutableArray *listArray = [NSMutableArray arrayWithArray:[fileContents componentsSeparatedByString:@"\n"]];
-        NSString *pianoName = [listArray objectAtIndex:0];
-        [listArray removeObjectAtIndex:0];
-        NSString *C3position = [listArray objectAtIndex:0];
-        float C3YPos = [C3position floatValue];
-        [listArray removeObjectAtIndex:0];
-        NSString *songName = [listArray objectAtIndex:0];
-        [listArray removeObjectAtIndex:0];
-     
-        //NSLog(songName);
-        
-        NSString *tempoString = [listArray objectAtIndex:0];
-      
-        //NSLog(tempoString);
-        
-        float tempo = [tempoString floatValue];
-        [listArray removeObjectAtIndex:0];
-        NSString *delayString = [listArray objectAtIndex:0];
-      
-        //NSLog(delayString);
-        
-        float delay = [delayString floatValue];
-        [listArray removeObjectAtIndex:0];
-        SKScene *customSongScene = [[MyScene alloc]initWithSize:self.size withSongName:songName withTempo:tempo withDelay:delay withInput:listArray withC3YPos:C3YPos withPianoName:pianoName];
-        customSongScene.scaleMode = SKSceneScaleModeAspectFill;
-        
-        [self.view presentScene:customSongScene transition:[SKTransition fadeWithDuration:1.5f]];
+        if (error)
+        {
+            NSLog(@"Error reading file: %@", error.localizedDescription);
+            NSLog(@"filePath: %@", filePath);
+            
+            _fileNotFound = 1;
+            [_textField removeFromSuperview];
+            [self addChild:_FileNotFound];
+        }
+        else
+        {
+            //Create the custom song scene here
+            [_textField removeFromSuperview];
+            
+            //NSLog(fileContents);
+            NSMutableArray *listArray = [NSMutableArray arrayWithArray:[fileContents componentsSeparatedByString:@"\n"]];
+            NSString *pianoName = [listArray objectAtIndex:0];
+            [listArray removeObjectAtIndex:0];
+            NSString *C3position = [listArray objectAtIndex:0];
+            float C3YPos = [C3position floatValue];
+            [listArray removeObjectAtIndex:0];
+            NSString *songName = [listArray objectAtIndex:0];
+            [listArray removeObjectAtIndex:0];
+         
+            //NSLog(songName);
+            
+            NSString *tempoString = [listArray objectAtIndex:0];
+          
+            //NSLog(tempoString);
+            
+            float tempo = [tempoString floatValue];
+            [listArray removeObjectAtIndex:0];
+            NSString *delayString = [listArray objectAtIndex:0];
+          
+            //NSLog(delayString);
+            
+            float delay = [delayString floatValue];
+            [listArray removeObjectAtIndex:0];
+            SKScene *customSongScene = [[HeadPhones alloc]initWithSize:self.size withSongName:songName withTempo:tempo withDelay:delay withInput:listArray withC3YPos:C3YPos withPianoName:pianoName];
+            customSongScene.scaleMode = SKSceneScaleModeAspectFill;
+            
+            [self.view presentScene:customSongScene transition:[SKTransition fadeWithDuration:1.5f]];
+        }
     }
 }
 
@@ -215,7 +217,7 @@
                         NSString* delayString = [listArray objectAtIndex:0];
                         float delay = [delayString floatValue];
                         [listArray removeObjectAtIndex:0];
-                        SKScene* customSongScene = [[MyScene alloc]initWithSize:self.size
+                        SKScene* customSongScene = [[HeadPhones alloc]initWithSize:self.size
                                                                    withSongName:songName
                                                                       withTempo:tempo
                                                                       withDelay:delay

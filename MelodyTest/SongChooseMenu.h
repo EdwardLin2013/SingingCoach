@@ -9,7 +9,7 @@
 #import "MainMenu.h"
 #import "MyScene.h"
 #import <AVFoundation/AVFoundation.h>
-
+#import "HeadPhones.h"
 
 @interface SongChooseMenu : SKScene<UITextFieldDelegate>
 

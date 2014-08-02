@@ -75,7 +75,6 @@
     float               _delay;                             // amount of time in seconds for the song to play wrt loading time
     NSString*           _pianoName;                         // the name of the piano file to render
     
-    int                 _checkPitch;                        //for times checking pitch
 
     //For scoring
     int                 _currentScore;
@@ -89,6 +88,8 @@
     //For onlines scoring
     double              _songLength;
     int                 _predictedTotalScore;
+    //for detecting microphone
+    SKSpriteNode*       _headPhones;
 }
 
 @property (nonatomic, strong) AVAudioPlayer* player;

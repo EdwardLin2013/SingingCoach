@@ -122,11 +122,12 @@
         double updateTime = totalTime * 58;
         printf("\n this is predicted totalScore: %f", updateTime);
         _predictedTotalScore = updateTime;
-        
-        
+
     }
     return self;
 }
+
+
 
 
 //Method for pitch detector initialization
@@ -155,7 +156,6 @@
     _totalscore = 0;
     
     _SparkleIdx = 1;
-    _checkPitch = 1; //Initial value of pitch checking
     _songIsOver = 0; //Exit or replay state
     _isPausedScene = 0; //Paused or not state
     
@@ -191,10 +191,10 @@
     _scoreBarXpos = self.frame.size.width/3;
     
     // Draw background (Only on devices not simulator)
-    /*SKSpriteNode *bg= [SKSpriteNode spriteNodeWithImageNamed:@"bg.png"];
-     bg.anchorPoint = CGPointMake(0,0);
-     bg.position = CGPointMake(0,0);
-     [self addChild:bg];*/
+    SKSpriteNode *bg= [SKSpriteNode spriteNodeWithImageNamed:@"bg.png"];
+    bg.anchorPoint = CGPointMake(0,0);
+    bg.position = CGPointMake(0,0);
+    [self addChild:bg];
     
     //Draw ScoreBar
     SKSpriteNode *ScoreBar = [SKSpriteNode spriteNodeWithImageNamed:@"ScoreLine.png"];
@@ -256,7 +256,6 @@
     _scoreValue.position = CGPointMake(508, 320-21);
     _scoreValue.zPosition = 11;
     [self addChild:_scoreValue];
-    
 
 }
 
@@ -436,8 +435,6 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
         else if (CGRectContainsPoint(exitSong, location))
         {
             NSLog(@"Exiting song");
-            SKScene *songChoose = [SongChooseMenu sceneWithSize:self.size];
-            songChoose.scaleMode = SKSceneScaleModeAspectFill;
             /* Stop the microphone */
             [_audioController stopIOUnit];
             _audioController = NULL;
@@ -446,10 +443,11 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
             [_NoteInput removeAllObjects];
             [_NoteOutput removeAllObjects];
             [_paths removeAllObjects];
+            
+            SKScene *songChoose = [SongChooseMenu sceneWithSize:self.size];
+            songChoose.scaleMode = SKSceneScaleModeAspectFill;
 
-            
             [self.view presentScene:songChoose transition:[SKTransition fadeWithDuration:1.5]];
-            
 
         }
     }
@@ -752,7 +750,7 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
         double finalScore = scoreEarned/totalAllScore * 100;
         
         printf("\n this is actualtotalscore : %f", totalAllScore);
-
+        [_scoreValue removeFromParent];
         _scoreValue = [SKLabelNode labelNodeWithFontNamed:@"IowanOldStyle-Roman"];
         _scoreValue.fontSize = 20;
         _scoreValue.fontColor = [UIColor blackColor];
@@ -760,11 +758,11 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
         _scoreValue.position = CGPointMake(335, 320-135);
         _scoreValue.zPosition = 11;
         [self addChild:_scoreValue];
-
         
         //Saving score
         NSUserDefaults* userDefs = [NSUserDefaults standardUserDefaults];
         
+        //chandelier = songType1, customSong = songType0, and etc based on order
         NSInteger songType = [userDefs integerForKey:@"songType"];
         NSString* HSstringToEnter = @"highScore";
         NSString* songTypeString = [NSString stringWithFormat:@"%d", (int)songType];
@@ -774,13 +772,52 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
         if (finalScore > HS){
             [userDefs setDouble:finalScore forKey:HSstringToEnter];
         }
+        //Saving finalScore to historylog
+        NSString* fileName = [userDefs objectForKey:@"myname"];
+        fileName = [fileName stringByAppendingString:@"'s score"];
+        fileName = [fileName stringByAppendingString:@".txt"];
         
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString *documentsDirectory = [paths objectAtIndex:0];
+        NSString *path = [documentsDirectory stringByAppendingPathComponent:fileName];
+
+        if (![[NSFileManager defaultManager] fileExistsAtPath:path]){
+            [[NSData data] writeToFile:path atomically:YES];
+        }
+        
+        // append
+        NSFileHandle *handle = [NSFileHandle fileHandleForWritingAtPath:path];
+        [handle truncateFileAtOffset:[handle seekToEndOfFile]];
+        
+        NSString *tempString = @"Score at date ";
+        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+        [dateFormatter setDateFormat:@"yyyyMMdd_HHmm"];
+        NSString *strNow = [dateFormatter stringFromDate:[NSDate date]];
+        
+        strNow = [tempString stringByAppendingString:strNow];
+        NSString *songTypeTemp = @" and song number: ";
+        strNow = [strNow stringByAppendingString:songTypeTemp];
+        strNow = [strNow stringByAppendingString:songTypeString];
+        
+        songTypeTemp = @" ";
+        strNow = [strNow stringByAppendingString:songTypeTemp];
+        
+        tempString = @" is: ";
+        strNow = [strNow stringByAppendingString: tempString];
+        
+        NSString* myScoreToWriteToHistory = [NSString stringWithFormat:@"%f", finalScore];
+        
+        myScoreToWriteToHistory = [strNow stringByAppendingString:myScoreToWriteToHistory];
+        myScoreToWriteToHistory = [myScoreToWriteToHistory stringByAppendingString:@"\n"];
+        
+        [handle writeData:[myScoreToWriteToHistory dataUsingEncoding:NSUTF8StringEncoding]];
+        [handle closeFile];
+        NSLog(@"Score saved.");
+
         _songIsOver = 3;
-        
-        
-        
     }
-    else if (_songIsOver == 3){
+    else if (_songIsOver == 3)
+    {
         //Do nothing
     }
     else
@@ -790,57 +827,60 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
         {
             [_player pause];
             self.view.paused = YES;
+            
         }
         
+        else{
         //Checking whether loading time has been exceeded
-        if (currentTime - _currTime > _loading)
-        {
-            if (_statusGo == 0)
+            if (currentTime - _currTime > _loading)
             {
-                _statusGo = 1;
-                [self loadNote];
+                if (_statusGo == 0)
+                {
+                    _statusGo = 1;
+                    [self loadNote];
+                    [self ArrowMove];
+                }
                 [self ArrowMove];
-            }
-            [self ArrowMove];
             
-            //Do Note Loading
-            SKSpriteNode *currNode = [_CurrentNode getNoteShape];
-            float location = currNode.frame.origin.x;
-            float nextNode = _framesize.width - [_CurrentNode getLength];
-            if (location < nextNode && _index < _NoteInput.count)
-                [self loadNote];
+                //Do Note Loading
+                SKSpriteNode *currNode = [_CurrentNode getNoteShape];
+                float location = currNode.frame.origin.x;
+                float nextNode = _framesize.width - [_CurrentNode getLength];
+                if (location < nextNode && _index < _NoteInput.count)
+                    [self loadNote];
             
-            //Do ClashCheck
-            [self clashCheck];
+                //Do ClashCheck
+                [self clashCheck];
             
-            //Do Note unloading
-            SKSpriteNode *frntNode = [_FrontNode getNoteShape];
-            float myLocation = frntNode.frame.origin.x;
-            if (myLocation <= 0 - (frntNode.self.frame.size.width) && _NoteOutput.count > 1)
-            {
-             [self unloadNote];
-            }
+                //Do Note unloading
+                SKSpriteNode *frntNode = [_FrontNode getNoteShape];
+                float myLocation = frntNode.frame.origin.x;
+                if (myLocation <= 0 - (frntNode.self.frame.size.width) && _NoteOutput.count > 1)
+                {
+                    [self unloadNote];
+                }
         
-            //Do pitchUpdate
-            [self pitchUpdate];
+                //Do pitchUpdate
+                [self pitchUpdate];
             
-            if (_scoreUpdate %20 == 0){
-               // printf("YES\n");
-                [_scoreValue removeFromParent];
-                double currentScore = (double)_myScore / (double)_predictedTotalScore * 100;
-                _scoreValue = [SKLabelNode labelNodeWithFontNamed:@"IowanOldStyle-Roman"];
-                _scoreValue.text = [NSString stringWithFormat:@"Current Score: %f", currentScore];
-                _scoreValue.fontSize = 10;
-                _scoreValue.fontColor = [UIColor blackColor];
-                _scoreValue.position = CGPointMake(508, 320-21);
-                _scoreValue.zPosition = 11;
-                [self addChild:_scoreValue];
-                _scoreUpdate = 1;
+                if (_scoreUpdate %20 == 0)
+                {
+                    // printf("YES\n");
+                    [_scoreValue removeFromParent];
+                    double currentScore = (double)_myScore / (double)_predictedTotalScore * 100;
+                    _scoreValue = [SKLabelNode labelNodeWithFontNamed:@"IowanOldStyle-Roman"];
+                    _scoreValue.text = [NSString stringWithFormat:@"Current Score: %f", currentScore];
+                    _scoreValue.fontSize = 10;
+                    _scoreValue.fontColor = [UIColor blackColor];
+                    _scoreValue.position = CGPointMake(508, 320-21);
+                    _scoreValue.zPosition = 11;
+                    [self addChild:_scoreValue];
+                    _scoreUpdate = 1;
+                }
+                else{
+                    _scoreUpdate = _scoreUpdate + 1;
+                }
             }
-            else{
-                _scoreUpdate = _scoreUpdate + 1;
-            }
-
         }
     }
 }
