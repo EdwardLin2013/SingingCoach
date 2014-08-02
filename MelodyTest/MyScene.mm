@@ -408,7 +408,7 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
             
         }
     }
-    else if (_songIsOver > 1)
+    else if (_songIsOver == 3)
     {
 
         
