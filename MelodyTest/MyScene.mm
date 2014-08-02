@@ -367,7 +367,7 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
                 _isPausedScene = 0;
                 
                 /* Stop the microphone and delete the tmp files */
-                [_audioController stopIOUnit];
+                [_audioController stopIOUnit];                _audioController = NULL;
                 [_audioController removeTmpFiles];
                 
                 [_StringInput removeAllObjects];
