@@ -30,14 +30,14 @@
         
         SKSpriteNode *Chandelier = [SKSpriteNode spriteNodeWithImageNamed:@"Chandelier.png"];
         Chandelier.anchorPoint = CGPointMake(0,0);
-        Chandelier.position = CGPointMake(94*_scaleW, (320-43)*_scaleH);
+        Chandelier.position = CGPointMake(94*_scaleW,(320-109)*_scaleH);
         Chandelier.xScale = _scaleW;
         Chandelier.yScale = _scaleH;
         [self addChild:Chandelier];
         
         _ChandelierListenNode = [SKSpriteNode spriteNodeWithImageNamed:@"ListenOff.png"];
         _ChandelierListenNode.anchorPoint = CGPointMake(0, 0);
-        _ChandelierListenNode.position = CGPointMake(400*_scaleW , (320 -43)*_scaleH);
+        _ChandelierListenNode.position = CGPointMake(460*_scaleW , (320 -111)*_scaleH);
         _ChandelierListenNode.name = @"ChandelierListenNode";
         _ChandelierListenNode.xScale = _scaleW;
         _ChandelierListenNode.yScale = _scaleH;
@@ -45,7 +45,7 @@
         
         SKSpriteNode *CustomSong = [SKSpriteNode spriteNodeWithImageNamed:@"CustomSong.png"];
         CustomSong.anchorPoint = CGPointMake(0, 0);
-        CustomSong.position = CGPointMake(94*_scaleW,(320-109)*_scaleH);
+        CustomSong.position = CGPointMake(94*_scaleW, (320-43)*_scaleH);
         CustomSong.xScale = _scaleW;
         CustomSong.yScale=_scaleH;
         [self addChild:CustomSong];
@@ -167,12 +167,12 @@
     {
         if (_cusSongState == 0)
         {
-            CGRect Chandelier = CGRectMake(78*_scaleW,( 320-62)*_scaleH, 323*_scaleW, 64*_scaleH);
-            CGRect ChandelierListen = CGRectMake(400*_scaleW, (320-60)*_scaleH,60*_scaleW,60*_scaleH);
+            CGRect Chandelier = CGRectMake(78*_scaleW, (320-126)*_scaleH, 200*_scaleW, 64*_scaleH);
+            CGRect ChandelierListen = CGRectMake(460*_scaleW, (320-111)*_scaleH,60*_scaleW,60*_scaleH);
             NSString* ChandelierPath = [[NSBundle mainBundle] pathForResource:@"chandelier" ofType:@"mp3"];
             NSURL* ChandelierURL = [NSURL fileURLWithPath:ChandelierPath];
     
-            CGRect CustomSong = CGRectMake(78*_scaleW, (320-126)*_scaleH, 323*_scaleW, 64*_scaleH);
+            CGRect CustomSong = CGRectMake(78*_scaleW,( 320-62)*_scaleH, 323*_scaleW, 64*_scaleH);
             CGRect exitButton = CGRectMake(0*_scaleW, (320-86)*_scaleH, 74*_scaleW  , 86*_scaleH);
 
             if (CGRectContainsPoint(Chandelier, location))
@@ -240,7 +240,7 @@
             
                     _ChandelierListenNode = [SKSpriteNode spriteNodeWithImageNamed:@"Listen.png"];
                     _ChandelierListenNode.anchorPoint = CGPointMake(0, 0);
-                    _ChandelierListenNode.position = CGPointMake(400*_scaleW, (320 -43)*_scaleH);
+                    _ChandelierListenNode.position = CGPointMake(460*_scaleW, (320 -111)*_scaleH);
                     _ChandelierListenNode.name = @"ChandelierListenNode";
                     _ChandelierListenNode.xScale = _scaleW;
                     _ChandelierListenNode.yScale = _scaleH;
@@ -258,7 +258,7 @@
         
                 _ChandelierListenNode = [SKSpriteNode spriteNodeWithImageNamed:@"ListenOff.png"];
                 _ChandelierListenNode.anchorPoint = CGPointMake(0, 0);
-                _ChandelierListenNode.position = CGPointMake(400*_scaleW, (320 -43)*_scaleH);
+                _ChandelierListenNode.position = CGPointMake(460*_scaleW, (320 - 111)*_scaleH);
                 _ChandelierListenNode.name = @"ChandelierListenNode";
                 _ChandelierListenNode.xScale = _scaleW;
                 _ChandelierListenNode.yScale = _scaleH;

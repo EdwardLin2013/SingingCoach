@@ -35,7 +35,7 @@
 {
     SKSpriteNode *Chandelier = [SKSpriteNode spriteNodeWithImageNamed:@"Chandelier.png"];
     Chandelier.anchorPoint = CGPointMake(0,0);
-    Chandelier.position = CGPointMake(94, 320-43);
+    Chandelier.position =CGPointMake(95,320-109);
     [self addChild:Chandelier];
     
     NSUserDefaults* userDefs = [NSUserDefaults standardUserDefaults];
@@ -45,14 +45,14 @@
     scoreValueChandelier.text = [NSString stringWithFormat:@"%f", HSChandelier];
     scoreValueChandelier.fontSize = 20;
     scoreValueChandelier.fontColor = [UIColor blackColor];
-    scoreValueChandelier.position = CGPointMake(354, 320-40);
+    scoreValueChandelier.position =CGPointMake(354, 320-107);
     scoreValueChandelier.zPosition = 1;
     [self addChild:scoreValueChandelier];
     
  
     SKSpriteNode *CustomSong = [SKSpriteNode spriteNodeWithImageNamed:@"cusSong.png"];
     CustomSong.anchorPoint = CGPointMake(0, 0);
-    CustomSong.position = CGPointMake(94,320-109);
+    CustomSong.position = CGPointMake(94, 320-43);
     [self addChild:CustomSong];
     
     double HSCustomSong = [userDefs doubleForKey:@"highScore0"];
@@ -62,7 +62,7 @@
     scoreValueCustSong.text = [NSString stringWithFormat:@"%f", HSCustomSong];
     scoreValueCustSong.fontSize = 20;
     scoreValueCustSong.fontColor = [UIColor blackColor];
-    scoreValueCustSong.position = CGPointMake(354, 320-107);
+    scoreValueCustSong.position = CGPointMake(354, 320-40);
     scoreValueCustSong.zPosition = 1;
     
     [self addChild:scoreValueCustSong];

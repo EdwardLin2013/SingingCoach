@@ -89,6 +89,7 @@
                 //Make noteInput arrays
                 if([_note compare:@"rest"])
                 {
+                    _songLength = _songLength + (double)lth;
                     SKSpriteNode *noteBox = [_NoteBox copy];
                     noteBox.anchorPoint = CGPointMake(0, 0);
                     noteBox.position = CGPointMake(_framesize.width - lth, yPos);
@@ -116,6 +117,12 @@
         _FrontNode = [_NoteInput objectAtIndex:0];
         _HittingNode = [_NoteInput objectAtIndex:0];
         _SparkledNode = [_NoteInput objectAtIndex:0];
+        printf("\n this is song Length : %f", _songLength);
+        double totalTime = _secPerBeat * _songLength;
+        double updateTime = totalTime * 58;
+        printf("\n this is predicted totalScore: %f", updateTime);
+        _predictedTotalScore = updateTime;
+        
         
     }
     return self;
@@ -137,10 +144,16 @@
 //Method for Song Player initialization
 -(void)startApp:(NSString*)pianoName
 {
-    _totalscoreArray = [[NSMutableArray alloc]init];
-    _scoreArray = [[NSMutableArray alloc]init];
-    _score = 0;
+    _scoreUpdate = 1;
+    
+    _predictedTotalScore = 0;
+    _songLength = 0;
+    _currentScore = 0;
+    _myScore=0;
+    _totalCurrentscore=0;
+    
     _totalscore = 0;
+    
     _SparkleIdx = 1;
     _checkPitch = 1; //Initial value of pitch checking
     _songIsOver = 0; //Exit or replay state
@@ -234,6 +247,17 @@
     _songOver.anchorPoint = CGPointMake(0, 0);
     _songOver.position = CGPointMake(0, 0);
     _songOver.zPosition = 10;
+    
+    //Make scoring
+    _scoreValue = [SKLabelNode labelNodeWithFontNamed:@"IowanOldStyle-Roman"];
+    _scoreValue.text = [NSString stringWithFormat:@"Current Score: 0.00000"];
+    _scoreValue.fontSize = 10;
+    _scoreValue.fontColor = [UIColor blackColor];
+    _scoreValue.position = CGPointMake(508, 320-21);
+    _scoreValue.zPosition = 11;
+    [self addChild:_scoreValue];
+    
+
 }
 
 //Method to setup musicPlayer
@@ -312,8 +336,8 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
 {
     CGPoint location =[ [touches anyObject] locationInNode:self];
     
-    CGRect resume = CGRectMake(173, 320-170, 90, 28);
-    CGRect exit  = CGRectMake(311, 320-171, 90, 28);
+    CGRect resume = CGRectMake(173, 320-184, 90, 28);
+    CGRect exit  = CGRectMake(311, 320-184, 90, 28);
     CGRect pauseButton = CGRectMake(568-15-3, 3, 15, 30);
     
     if (_songIsOver == 0)
@@ -331,6 +355,7 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
             if (CGRectContainsPoint(resume, location))
             {
                 NSLog(@"Resuming song");
+               // [_scoreValue removeFromParent];
                 [_PauseOverlay removeFromParent];
                 [_player play];
                 self.view.paused = NO;
@@ -342,11 +367,6 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
                 self.view.paused = NO;
                 _isPausedScene = 0;
                 
-                SKScene *songChoose = [SongChooseMenu sceneWithSize:self.size];
-                songChoose.scaleMode = SKSceneScaleModeAspectFill;
-                
-                [self.view presentScene:songChoose transition:[SKTransition fadeWithDuration:1.5]];
-
                 /* Stop the microphone and delete the tmp files */
                 [_audioController stopIOUnit];
                 [_audioController removeTmpFiles];
@@ -355,6 +375,13 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
                 [_NoteInput removeAllObjects];
                 [_NoteOutput removeAllObjects];
                 [_paths removeAllObjects];
+                
+                SKScene *songChoose = [SongChooseMenu sceneWithSize:self.size];
+                songChoose.scaleMode = SKSceneScaleModeAspectFill;
+                
+                [self.view presentScene:songChoose transition:[SKTransition fadeWithDuration:1.5]];
+
+
             }
         }
     }
@@ -553,6 +580,7 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
     if (_NoteOutput.count == 1)
     {
         [self addChild:_SaveRecordingOverlay];
+        [_scoreValue removeFromParent];
         _songIsOver = 1;
     }
 
@@ -573,10 +601,10 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
     float barMin = CGRectGetMinX(bar.frame);
     float noteMax = CGRectGetMaxX(clash.frame);
     float range = [_HittingNode getyLocation];
-    float mylength = clash.frame.size.width;
+    //float mylength = clash.frame.size.width;
     
     //hit first Half a note to score full marks
-    noteMax = noteMax - mylength /2;
+   // noteMax = noteMax - mylength /2;
     
      if (barMin > noteMin && noteMax > barMin && [pitchHitNode compare:@"rest"] != 0){
          if (_firstColision == 0){
@@ -587,19 +615,23 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
          }
          
          if (_Arrow.self.frame.origin.y <= range + 11 && _Arrow.self.frame.origin.y>=range){
-             _score++;
+             _currentScore++;
          }
-         _totalscore ++;
+         _totalCurrentscore ++;
+         _totalscore++;
 
      }
     
      else if ((noteMax < barMin && _idx < _NoteInput.count) || ([pitchHitNode compare:@"rest"] == 0 && _idx < _NoteInput.count)){
          
-         [_scoreArray addObject:[NSNumber numberWithInt:_score]];
-         [_totalscoreArray addObject:[NSNumber numberWithInt:_totalscore]];
-         
-         _score = 0;
-         _totalscore = 0;
+         double scoreCompare = (double)_currentScore / (double)_totalCurrentscore;
+         if (scoreCompare >= 0.333)
+             _myScore = _myScore + _totalCurrentscore;
+         else
+             _myScore = _myScore + _currentScore;
+
+         _currentScore = 0;
+         _totalCurrentscore = 0;
          
          _HittingNode = [_NoteInput objectAtIndex:_idx];
          _idx++;
@@ -696,7 +728,7 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
         yPositionforArrow = _framesize.height - 3;
     
     CGPoint position = CGPointMake(_starting, yPositionforArrow + 5);
-    SKAction *moveToLocation = [SKAction moveTo:position duration:0.5];
+    SKAction *moveToLocation = [SKAction moveTo:position duration:0.1];
     [_Arrow runAction:moveToLocation];
 }
 
@@ -714,28 +746,18 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
     //score calculation
     else if (_songIsOver == 2 )
     {
-        double scoreEarned = 0;
-        double totalAllScore = 0;
-        for (int i = 0; i<_scoreArray.count;i++){
-            NSNumber *number = [_scoreArray objectAtIndex:i];
-            NSNumber *numberTotal = [_totalscoreArray objectAtIndex:i];
-            double numberDouble = [number doubleValue];
-            double numberTotalDouble = [numberTotal doubleValue];
-            double divisionResult = numberDouble / numberTotalDouble;
-            if (divisionResult >= 0.5){
-                numberDouble = numberTotalDouble;
-            }
-            scoreEarned = scoreEarned + numberDouble;
-            totalAllScore = totalAllScore + numberTotalDouble;
-        }
+        double scoreEarned = (double)_myScore;
+        double totalAllScore = (double)_totalscore;
 
         double finalScore = scoreEarned/totalAllScore * 100;
         
+        printf("\n this is actualtotalscore : %f", totalAllScore);
+
         _scoreValue = [SKLabelNode labelNodeWithFontNamed:@"IowanOldStyle-Roman"];
-        _scoreValue.text = [NSString stringWithFormat:@"%f", finalScore];
         _scoreValue.fontSize = 20;
         _scoreValue.fontColor = [UIColor blackColor];
-        _scoreValue.position = CGPointMake(325, 320-135);
+        _scoreValue.text = [NSString stringWithFormat:@"%f", finalScore];
+        _scoreValue.position = CGPointMake(335, 320-135);
         _scoreValue.zPosition = 11;
         [self addChild:_scoreValue];
 
@@ -795,16 +817,30 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
             SKSpriteNode *frntNode = [_FrontNode getNoteShape];
             float myLocation = frntNode.frame.origin.x;
             if (myLocation <= 0 - (frntNode.self.frame.size.width) && _NoteOutput.count > 1)
-                [self unloadNote];
-        
-            //Do Pitch Detection
-            if (_checkPitch%2 == 0)
             {
-                [self pitchUpdate];
-                _checkPitch = 1;
+             [self unloadNote];
             }
-            else
-                _checkPitch ++;
+        
+            //Do pitchUpdate
+            [self pitchUpdate];
+            
+            if (_scoreUpdate %20 == 0){
+               // printf("YES\n");
+                [_scoreValue removeFromParent];
+                double currentScore = (double)_myScore / (double)_predictedTotalScore * 100;
+                _scoreValue = [SKLabelNode labelNodeWithFontNamed:@"IowanOldStyle-Roman"];
+                _scoreValue.text = [NSString stringWithFormat:@"Current Score: %f", currentScore];
+                _scoreValue.fontSize = 10;
+                _scoreValue.fontColor = [UIColor blackColor];
+                _scoreValue.position = CGPointMake(508, 320-21);
+                _scoreValue.zPosition = 11;
+                [self addChild:_scoreValue];
+                _scoreUpdate = 1;
+            }
+            else{
+                _scoreUpdate = _scoreUpdate + 1;
+            }
+
         }
     }
 }

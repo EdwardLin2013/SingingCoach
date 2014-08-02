@@ -78,11 +78,17 @@
     int                 _checkPitch;                        //for times checking pitch
 
     //For scoring
-    int                 _score;
+    int                 _currentScore;
+    int                 _myScore;
+    int                 _totalCurrentscore;
     int                 _totalscore;
-    NSMutableArray*     _scoreArray;
-    NSMutableArray*     _totalscoreArray;
     SKLabelNode*        _scoreValue;
+    
+    int                 _scoreUpdate;
+    
+    //For onlines scoring
+    double              _songLength;
+    int                 _predictedTotalScore;
 }
 
 @property (nonatomic, strong) AVAudioPlayer* player;
