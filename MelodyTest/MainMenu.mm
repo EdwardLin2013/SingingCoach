@@ -28,7 +28,8 @@
         _myName = [_userDefs stringForKey:@"myname"];
         
         if (_myName == nil){
-            _myName = @"(not set)";
+            _myName = @"not set";
+            [_userDefs setObject:_myName forKey:@"myname"];
         }
         
         _PlayerNameText = [SKLabelNode labelNodeWithFontNamed:@"IowanOldStyle-Roman"];
