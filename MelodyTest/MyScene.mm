@@ -625,7 +625,7 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
      else if ((noteMax < barMin && _idx < _NoteInput.count) || ([pitchHitNode compare:@"rest"] == 0 && _idx < _NoteInput.count)){
          
          double scoreCompare = (double)_currentScore / (double)_totalCurrentscore;
-         if (scoreCompare >= 0.333)
+         if (scoreCompare >= 0.2)
              _myScore = _myScore + _totalCurrentscore;
          else
              _myScore = _myScore + _currentScore;
