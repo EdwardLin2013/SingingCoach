@@ -4,7 +4,7 @@ pianoB2B4.png
 9
 sixdegrees
 148	
-0.25
+0.28
 0.5 B2
 1.0 E3
 0.5 F#3

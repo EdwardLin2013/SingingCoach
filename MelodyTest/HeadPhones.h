@@ -28,6 +28,7 @@
     float           _lyricsDuration;
 }
 
+/* -----------------------------Public Methods--------------------------------- Begin */
 -(id)initWithSize:(CGSize)size
      withSongName:(NSString*)songName
         withTempo: (float)tempoInput
@@ -37,6 +38,13 @@
     withPianoName:(NSString*)pianoName
        withLyrics:(NSString *)lyricsName
 withLyricsDuration:(float)lyricsDuration;
+
+/* -----------------------------Public Methods--------------------------------- End */
+
+/* -----------------------------Private Methods--------------------------------- Begin */
+
+- (BOOL)isHeadsetPluggedIn;
+/* -----------------------------Private Methods--------------------------------- End */
 
 
 @end

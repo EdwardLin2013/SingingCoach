@@ -280,6 +280,7 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
     else
     {
         NSLog(@"succeed!");
+        _songPlayStartTime = _currTime + shortStartDelay;
         [_player playAtTime:_currTime + shortStartDelay];
     }
 }
@@ -351,15 +352,18 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
     {
         if (CGRectContainsPoint(pauseButton, location))
         {
+            if (_statusGo == 1 && (CACurrentMediaTime() > _songPlayStartTime))
+            {
             //Do this instead of pausing right away is to give time for the pauseOverlay to appear on the screen
             [self addChild:_PauseOverlay];
             _isPausedScene= 1;
-            
+            _pauseTime = CACurrentMediaTime();
             NSLog(@"Pausing song");
+            }
         }
         else if (self.view.isPaused)
         {
-            if (CGRectContainsPoint(resume, location))
+            if (CGRectContainsPoint(resume, location) && ((CACurrentMediaTime() - _pauseTime)>1.3f))
             {
                 NSLog(@"Resuming song");
                // [_scoreValue removeFromParent];
@@ -368,7 +372,7 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
                 self.view.paused = NO;
                 _isPausedScene = 0;
             }
-            else if (CGRectContainsPoint(exit, location))
+            else if (CGRectContainsPoint(exit, location)&& ((CACurrentMediaTime() - _pauseTime)>1.3f))
             {
                 NSLog(@"Exiting Song");
                 self.view.paused = NO;
@@ -893,17 +897,15 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
     }
 }
 
--(void) setupLyrics:(NSString*)filename withDuration:(float)songDuration{
+-(void) setupLyrics:(NSString*)filename withDuration:(float)songDuration
+{
     NSString *filepath = [[NSBundle mainBundle] pathForResource:filename ofType:@"txt"];
     NSError *error;
     NSString *fileContents = [NSString stringWithContentsOfFile:filepath encoding:NSUTF8StringEncoding error:&error];
     
     if (error)
         NSLog(@"Error reading file: %@", error.localizedDescription);
-    
-    // maybe for debugging...
-   // NSLog(@"contents: %@", fileContents);
-    
+
     NSMutableArray *listArray = [NSMutableArray arrayWithArray:[fileContents componentsSeparatedByString:@"\n"]];
     
     _Text = [SKNode node];
@@ -918,12 +920,14 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
     
     int count = 0;
     int distance = 100;
-    if (listArray.count > 26){
+    if (listArray.count > 26)
+    {
         int leftover = (int)listArray.count - 28;
         distance = leftover * 12;
     }
     
-    for (NSString* string in listArray){
+    for (NSString* string in listArray)
+    {
         
         SKLabelNode *a = [SKLabelNode labelNodeWithFontNamed:@"IowanOldStyle-Bold"];
         a.horizontalAlignmentMode = SKLabelHorizontalAlignmentModeLeft;
@@ -946,29 +950,31 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
     
 }
 
--(void) didMoveToView: (SKView *) view  {
+-(void) didMoveToView: (SKView *) view
+{
 
-        _swipeRightGesture = [[UISwipeGestureRecognizer alloc] initWithTarget: self action: @selector( handleSwipeRight:)];
-        [_swipeRightGesture setDirection: UISwipeGestureRecognizerDirectionRight];
-    
-        [view addGestureRecognizer: _swipeRightGesture ];
-    
-        _swipeLeftGesture = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(handleSwipeLeft:)];
-        [_swipeLeftGesture setDirection:UISwipeGestureRecognizerDirectionLeft];
-        [view addGestureRecognizer:_swipeLeftGesture];
-    
+    _swipeRightGesture = [[UISwipeGestureRecognizer alloc] initWithTarget: self action: @selector( handleSwipeRight:)];
+    [_swipeRightGesture setDirection: UISwipeGestureRecognizerDirectionRight];
+
+    [view addGestureRecognizer: _swipeRightGesture ];
+
+    _swipeLeftGesture = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(handleSwipeLeft:)];
+    [_swipeLeftGesture setDirection:UISwipeGestureRecognizerDirectionLeft];
+    [view addGestureRecognizer:_swipeLeftGesture];
+
 }
 
-- ( void ) willMoveFromView: (SKView *) view {
+- ( void ) willMoveFromView: (SKView *) view
+{
+    [view removeGestureRecognizer: _swipeRightGesture ];
+    [view removeGestureRecognizer:_swipeLeftGesture];
     NSLog(@"Removing gesReg");
-        [view removeGestureRecognizer: _swipeRightGesture ];
-        [view removeGestureRecognizer:_swipeLeftGesture];
 
 }
  
 
--(void) handleSwipeLeft: ( UISwipeGestureRecognizer*) recognizer{
-    
+-(void) handleSwipeLeft: ( UISwipeGestureRecognizer*) recognizer
+{
     if (_TextState == 0){
         SKAction *goLeft = [SKAction moveByX:-138 y:0 duration:0.5f];
         [_lyricsoverlay runAction:goLeft];
@@ -977,26 +983,17 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
         _Text.hidden = NO;
         _TextState = 1;
     }
-    else{
-        //do nothing
-    }
+
 }
--(void) handleSwipeRight:( UISwipeGestureRecognizer *) recognizer {
+-(void) handleSwipeRight:( UISwipeGestureRecognizer *) recognizer
+{
     
-    /*   if ( recognizer.numberOfTouches == 2) {
-     // do something if the swipe right had exactly 2 fingers involved
-     } else {
-     // do something else
-     }*/
-    
-    if (_TextState == 1){
+    if (_TextState == 1)
+    {
         SKAction *goRight = [SKAction moveByX:138 y:0 duration:0.5f];
         [_lyricsoverlay runAction:goRight];
         [_Text runAction:goRight];
         _TextState = 0;
-    }
-    else{
-        //do nothing
     }
 }
 

@@ -58,19 +58,23 @@ withLyricsDuration:(float)lyricsDuration
     
     if(_hpState == 0){
     BOOL value = [self isHeadsetPluggedIn];
-    if (value == true && _yesDisplayed == 0){
+    if (value == true && _yesDisplayed == 0)
+    {
         [_headPhones removeFromParent];
         [self addChild:_beginOverlay];
         _yesDisplayed = 1;
         _hpState = 1;
 
     }
-    else if (value==true && _yesDisplayed == 1){
+    else if (value==true && _yesDisplayed == 1)
+    {
         _hpState = 1;
     }
 
-    else if (value == false){
-            if ( _displayed == 0){
+    else if (value == false)
+    {
+            if ( _displayed == 0)
+            {
                 [self addChild:_headPhones];
                 _displayed = 1;
             }
@@ -80,9 +84,11 @@ withLyricsDuration:(float)lyricsDuration
 }
 
 
-- (BOOL)isHeadsetPluggedIn {
+- (BOOL)isHeadsetPluggedIn
+{
     AVAudioSessionRouteDescription* route = [[AVAudioSession sharedInstance] currentRoute];
-    for (AVAudioSessionPortDescription* desc in [route outputs]) {
+    for (AVAudioSessionPortDescription* desc in [route outputs])
+    {
         if ([[desc portType] isEqualToString:AVAudioSessionPortHeadphones])
             return YES;
     }

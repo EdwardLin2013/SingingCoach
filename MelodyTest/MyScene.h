@@ -88,7 +88,8 @@
     //For onlines scoring
     double              _songLength;
     int                 _predictedTotalScore;
-    //for detecting microphone
+    
+    //For detecting microphone
     SKSpriteNode*       _headPhones;
     
     
@@ -99,6 +100,9 @@
     NSString*                 _LyricsName;
     float                     _lyricsDuration;
     SKSpriteNode*             _lyricsoverlay;
+    
+    NSTimeInterval            _songPlayStartTime;
+    NSTimeInterval            _pauseTime;
 }
 
 @property (nonatomic, strong) AVAudioPlayer* player;
@@ -128,6 +132,13 @@ withLyricsDuration:(float)lyricsDuration;
 -(void)clashCheck;                                          //Called by update to check whether there's clashing with scorebar
 -(void)ArrowMove;                                           //Called by update to render arrow tails
 -(void)pitchUpdate;                                         //Called by update to detect pitch
+-(void) setupLyrics:(NSString*)filename
+       withDuration:(float)songDuration;                    //Initialization of lyrics
+-(void) handleSwipeRight:
+( UISwipeGestureRecognizer *) recognizer;                   //Selector for swipe right
+-(void) handleSwipeLeft:
+( UISwipeGestureRecognizer*) recognizer;                    //Selector for swipe left
+
 /* -----------------------------Private Methods--------------------------------- End */
 
 @end

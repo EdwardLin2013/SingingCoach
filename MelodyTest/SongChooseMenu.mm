@@ -37,7 +37,7 @@
         
         _ChandelierListenNode = [SKSpriteNode spriteNodeWithImageNamed:@"ListenOff.png"];
         _ChandelierListenNode.anchorPoint = CGPointMake(0, 0);
-        _ChandelierListenNode.position = CGPointMake(460*_scaleW , (320 -111)*_scaleH);
+        _ChandelierListenNode.position = CGPointMake(320*_scaleW , (320 -111)*_scaleH);
         _ChandelierListenNode.name = @"ChandelierListenNode";
         _ChandelierListenNode.xScale = _scaleW;
         _ChandelierListenNode.yScale = _scaleH;
@@ -175,7 +175,7 @@
         if (_cusSongState == 0)
         {
             CGRect Chandelier = CGRectMake(78*_scaleW, (320-126)*_scaleH, 200*_scaleW, 64*_scaleH);
-            CGRect ChandelierListen = CGRectMake(460*_scaleW, (320-111)*_scaleH,60*_scaleW,60*_scaleH);
+            CGRect ChandelierListen = CGRectMake(320*_scaleW, (320-111)*_scaleH,60*_scaleW,60*_scaleH);
             NSString* ChandelierPath = [[NSBundle mainBundle] pathForResource:@"chandelier" ofType:@"mp3"];
             NSURL* ChandelierURL = [NSURL fileURLWithPath:ChandelierPath];
     
@@ -254,7 +254,7 @@
             
                     _ChandelierListenNode = [SKSpriteNode spriteNodeWithImageNamed:@"Listen.png"];
                     _ChandelierListenNode.anchorPoint = CGPointMake(0, 0);
-                    _ChandelierListenNode.position = CGPointMake(460*_scaleW, (320 -111)*_scaleH);
+                    _ChandelierListenNode.position = CGPointMake(320*_scaleW, (320 -111)*_scaleH);
                     _ChandelierListenNode.name = @"ChandelierListenNode";
                     _ChandelierListenNode.xScale = _scaleW;
                     _ChandelierListenNode.yScale = _scaleH;
@@ -272,7 +272,7 @@
         
                 _ChandelierListenNode = [SKSpriteNode spriteNodeWithImageNamed:@"ListenOff.png"];
                 _ChandelierListenNode.anchorPoint = CGPointMake(0, 0);
-                _ChandelierListenNode.position = CGPointMake(460*_scaleW, (320 - 111)*_scaleH);
+                _ChandelierListenNode.position = CGPointMake(320*_scaleW, (320 - 111)*_scaleH);
                 _ChandelierListenNode.name = @"ChandelierListenNode";
                 _ChandelierListenNode.xScale = _scaleW;
                 _ChandelierListenNode.yScale = _scaleH;
