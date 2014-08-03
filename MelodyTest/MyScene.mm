@@ -17,6 +17,8 @@
         withInput: (NSMutableArray*)input
        withC3YPos: (float)C3Position
     withPianoName:(NSString*)pianoName
+       withLyrics:(NSString *)lyricsName
+withLyricsDuration:(float)lyricsDuration
 {
     if (self = [super initWithSize:size])
     {
@@ -28,6 +30,8 @@
         _delay = delay;
         _pianoName = pianoName;
         _tempo = tempoInput;
+        _LyricsName = lyricsName;
+        _lyricsDuration = lyricsDuration;
         _framesize = self.size;
         _currTime = CACurrentMediaTime();
         
@@ -57,6 +61,7 @@
         }
         else{
             [self playMusic:songName withShortStartDelay:totalDelayTime];
+
         }
         
 
@@ -122,6 +127,9 @@
         double updateTime = totalTime * 58;
         printf("\n this is predicted totalScore: %f", updateTime);
         _predictedTotalScore = updateTime;
+        
+        [self setupLyrics:lyricsName withDuration:lyricsDuration];
+
 
     }
     return self;
@@ -253,7 +261,7 @@
     _scoreValue.text = [NSString stringWithFormat:@"Current Score: 0.00000"];
     _scoreValue.fontSize = 10;
     _scoreValue.fontColor = [UIColor blackColor];
-    _scoreValue.position = CGPointMake(508, 320-22);
+    _scoreValue.position = CGPointMake(_framesize.width/2 , 320-10);
     _scoreValue.zPosition = 11;
     [self addChild:_scoreValue];
 
@@ -417,7 +425,7 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
         
         if (CGRectContainsPoint(replay, location))
         {
-            SKScene *replaySong = [[MyScene alloc]initWithSize:self.size withSongName:_songName withTempo:_tempo withDelay:_delay withInput:_StringInput withC3YPos:_C3Ypos withPianoName:_pianoName];
+            SKScene *replaySong = [[MyScene alloc]initWithSize:self.size withSongName:_songName withTempo:_tempo withDelay:_delay withInput:_StringInput withC3YPos:_C3Ypos withPianoName:_pianoName withLyrics:_LyricsName withLyricsDuration:_lyricsDuration];
             replaySong.scaleMode = SKSceneScaleModeAspectFill;
             NSLog(@"Replaying song");
             /* Stop the microphone */
@@ -872,7 +880,7 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
                     _scoreValue.text = [NSString stringWithFormat:@"Current Score: %f", currentScore];
                     _scoreValue.fontSize = 10;
                     _scoreValue.fontColor = [UIColor blackColor];
-                    _scoreValue.position = CGPointMake(508, 320-22);
+                    _scoreValue.position = CGPointMake(_framesize.width/2 , 320-10);
                     _scoreValue.zPosition = 11;
                     [self addChild:_scoreValue];
                     _scoreUpdate = 1;
@@ -884,4 +892,114 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
         }
     }
 }
+
+-(void) setupLyrics:(NSString*)filename withDuration:(float)songDuration{
+    NSString *filepath = [[NSBundle mainBundle] pathForResource:filename ofType:@"txt"];
+    NSError *error;
+    NSString *fileContents = [NSString stringWithContentsOfFile:filepath encoding:NSUTF8StringEncoding error:&error];
+    
+    if (error)
+        NSLog(@"Error reading file: %@", error.localizedDescription);
+    
+    // maybe for debugging...
+   // NSLog(@"contents: %@", fileContents);
+    
+    NSMutableArray *listArray = [NSMutableArray arrayWithArray:[fileContents componentsSeparatedByString:@"\n"]];
+    
+    _Text = [SKNode node];
+    _Text.zPosition = 2;
+    
+    _lyricsoverlay= [SKSpriteNode spriteNodeWithImageNamed:@"lyricsOverlay"];
+    _lyricsoverlay.anchorPoint = CGPointMake(0, 0);
+    _lyricsoverlay.position = CGPointMake(564, 0);
+    _lyricsoverlay.zPosition = 2;
+    _lyricsoverlay.hidden = YES;
+    [self addChild:_lyricsoverlay];
+    
+    int count = 0;
+    int distance = 100;
+    if (listArray.count > 26){
+        int leftover = (int)listArray.count - 28;
+        distance = leftover * 12;
+    }
+    
+    for (NSString* string in listArray){
+        
+        SKLabelNode *a = [SKLabelNode labelNodeWithFontNamed:@"IowanOldStyle-Bold"];
+        a.horizontalAlignmentMode = SKLabelHorizontalAlignmentModeLeft;
+        a.fontSize = 10;
+        a.fontColor = [SKColor blackColor];
+        a.position = CGPointMake(a.position.x, a.position.y - (11 * count));
+        count++;
+        a.text = string;
+        [_Text addChild:a];
+        
+    }
+    
+    _Text.position = CGPointMake(570, 295.0);
+    SKAction* moveUp = [SKAction moveByX:0 y:distance duration:songDuration];
+    [_Text runAction:moveUp];
+    
+    _Text.hidden = YES;
+    [self addChild:_Text];
+    _TextState = 0;
+    
+}
+
+-(void) didMoveToView: (SKView *) view  {
+
+        _swipeRightGesture = [[UISwipeGestureRecognizer alloc] initWithTarget: self action: @selector( handleSwipeRight:)];
+        [_swipeRightGesture setDirection: UISwipeGestureRecognizerDirectionRight];
+    
+        [view addGestureRecognizer: _swipeRightGesture ];
+    
+        _swipeLeftGesture = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(handleSwipeLeft:)];
+        [_swipeLeftGesture setDirection:UISwipeGestureRecognizerDirectionLeft];
+        [view addGestureRecognizer:_swipeLeftGesture];
+    
+}
+
+- ( void ) willMoveFromView: (SKView *) view {
+    NSLog(@"Removing gesReg");
+        [view removeGestureRecognizer: _swipeRightGesture ];
+        [view removeGestureRecognizer:_swipeLeftGesture];
+
+}
+ 
+
+-(void) handleSwipeLeft: ( UISwipeGestureRecognizer*) recognizer{
+    
+    if (_TextState == 0){
+        SKAction *goLeft = [SKAction moveByX:-138 y:0 duration:0.5f];
+        [_lyricsoverlay runAction:goLeft];
+        [_Text runAction:goLeft];
+        _lyricsoverlay.hidden = NO;
+        _Text.hidden = NO;
+        _TextState = 1;
+    }
+    else{
+        //do nothing
+    }
+}
+-(void) handleSwipeRight:( UISwipeGestureRecognizer *) recognizer {
+    
+    /*   if ( recognizer.numberOfTouches == 2) {
+     // do something if the swipe right had exactly 2 fingers involved
+     } else {
+     // do something else
+     }*/
+    
+    if (_TextState == 1){
+        SKAction *goRight = [SKAction moveByX:138 y:0 duration:0.5f];
+        [_lyricsoverlay runAction:goRight];
+        [_Text runAction:goRight];
+        _TextState = 0;
+    }
+    else{
+        //do nothing
+    }
+}
+
+
+
 @end

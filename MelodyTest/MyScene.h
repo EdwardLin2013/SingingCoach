@@ -90,6 +90,15 @@
     int                 _predictedTotalScore;
     //for detecting microphone
     SKSpriteNode*       _headPhones;
+    
+    
+    UISwipeGestureRecognizer* _swipeRightGesture;
+    UISwipeGestureRecognizer* _swipeLeftGesture;
+    int                       _TextState;
+    SKNode*                   _Text;
+    NSString*                 _LyricsName;
+    float                     _lyricsDuration;
+    SKSpriteNode*             _lyricsoverlay;
 }
 
 @property (nonatomic, strong) AVAudioPlayer* player;
@@ -101,7 +110,9 @@
         withDelay: (float)delay
         withInput: (NSMutableArray*)input
        withC3YPos: (float)C3Position
-    withPianoName:(NSString*)pianoName;
+    withPianoName:(NSString*)pianoName
+       withLyrics:(NSString*)lyricsName
+withLyricsDuration:(float)lyricsDuration;
 
 /* -----------------------------Public Methods--------------------------------- End */
 

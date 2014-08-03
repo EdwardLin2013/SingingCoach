@@ -24,6 +24,8 @@
     NSMutableArray* _input;
     float           _C3Position;
     NSString*       _pianoName;
+    NSString*       _lyricsName;
+    float           _lyricsDuration;
 }
 
 -(id)initWithSize:(CGSize)size
@@ -32,7 +34,9 @@
         withDelay: (float)delay
         withInput: (NSMutableArray*)input
        withC3YPos: (float)C3Position
-    withPianoName:(NSString*)pianoName;
+    withPianoName:(NSString*)pianoName
+       withLyrics:(NSString *)lyricsName
+withLyricsDuration:(float)lyricsDuration;
 
 
 @end

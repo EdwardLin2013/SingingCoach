@@ -116,6 +116,11 @@
             
             //NSLog(fileContents);
             NSMutableArray *listArray = [NSMutableArray arrayWithArray:[fileContents componentsSeparatedByString:@"\n"]];
+            NSString *lyricsName = [listArray objectAtIndex:0];
+            [listArray removeObjectAtIndex:0];
+            NSString* lyricsDuration = [listArray objectAtIndex:0];
+            [listArray removeObjectAtIndex:0];
+            float lyricsDurationfloat = [lyricsDuration floatValue];
             NSString *pianoName = [listArray objectAtIndex:0];
             [listArray removeObjectAtIndex:0];
             NSString *C3position = [listArray objectAtIndex:0];
@@ -138,7 +143,7 @@
             
             float delay = [delayString floatValue];
             [listArray removeObjectAtIndex:0];
-            SKScene *customSongScene = [[HeadPhones alloc]initWithSize:self.size withSongName:songName withTempo:tempo withDelay:delay withInput:listArray withC3YPos:C3YPos withPianoName:pianoName];
+            SKScene *customSongScene = [[HeadPhones alloc]initWithSize:self.size withSongName:songName withTempo:tempo withDelay:delay withInput:listArray withC3YPos:C3YPos withPianoName:pianoName withLyrics:lyricsName withLyricsDuration:lyricsDurationfloat];
             customSongScene.scaleMode = SKSceneScaleModeAspectFill;
             
             [self.view presentScene:customSongScene transition:[SKTransition fadeWithDuration:1.5f]];
@@ -204,6 +209,11 @@
                     else
                     {
                         NSMutableArray* listArray = [NSMutableArray arrayWithArray:[fileContents componentsSeparatedByString:@"\n"]];
+                        NSString* lyricsName = [listArray objectAtIndex:0];
+                        [listArray removeObjectAtIndex:0];
+                        NSString* lyricsDuration = [listArray objectAtIndex:0];
+                        [listArray removeObjectAtIndex:0];
+                        float lyricsDurationFloat = [lyricsDuration floatValue];
                         NSString* pianoName = [listArray objectAtIndex:0];
                         [listArray removeObjectAtIndex:0];
                         NSString* C3position = [listArray objectAtIndex:0];
@@ -217,15 +227,17 @@
                         NSString* delayString = [listArray objectAtIndex:0];
                         float delay = [delayString floatValue];
                         [listArray removeObjectAtIndex:0];
-                        SKScene* customSongScene = [[HeadPhones alloc]initWithSize:self.size
+                        SKScene* SongScene = [[HeadPhones alloc]initWithSize:self.size
                                                                    withSongName:songName
                                                                       withTempo:tempo
                                                                       withDelay:delay
                                                                       withInput:listArray
                                                                      withC3YPos:C3YPos
-                                                                  withPianoName:pianoName];
-                        customSongScene.scaleMode = SKSceneScaleModeAspectFill;
-                        [self.view presentScene:customSongScene transition:[SKTransition fadeWithDuration:1.5f]];
+                                                                  withPianoName:pianoName
+                                              withLyrics:lyricsName
+                                              withLyricsDuration:lyricsDurationFloat];
+                        SongScene.scaleMode = SKSceneScaleModeAspectFill;
+                        [self.view presentScene:SongScene transition:[SKTransition fadeWithDuration:1.5f]];
                     }
                 }
             }

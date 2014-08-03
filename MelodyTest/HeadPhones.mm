@@ -20,7 +20,9 @@
         withDelay: (float)delay
         withInput: (NSMutableArray*)input
        withC3YPos: (float)C3Position
-    withPianoName:(NSString*)pianoName;
+    withPianoName:(NSString*)pianoName
+withLyrics:(NSString*)lyricsName
+withLyricsDuration:(float)lyricsDuration
 {
     if (self = [super initWithSize:size])
     {
@@ -30,6 +32,8 @@
         _input = input;
         _C3Position = C3Position;
         _pianoName = pianoName;
+        _lyricsName = lyricsName;
+        _lyricsDuration = lyricsDuration;
         
         self.backgroundColor = [UIColor blackColor];
         _headPhones = [SKSpriteNode spriteNodeWithImageNamed:@"PauseOverlayHeadphone.png"];
@@ -89,7 +93,7 @@
 {
     if(_hpState == 1)
     {
-        SKScene *songScene = [[MyScene alloc]initWithSize:self.size withSongName:_songName withTempo:_tempoInput withDelay:_delay withInput:_input withC3YPos:_C3Position withPianoName:_pianoName];
+        SKScene *songScene = [[MyScene alloc]initWithSize:self.size withSongName:_songName withTempo:_tempoInput withDelay:_delay withInput:_input withC3YPos:_C3Position withPianoName:_pianoName withLyrics:_lyricsName withLyricsDuration:_lyricsDuration];
         songScene.scaleMode = SKSceneScaleModeAspectFill;
         
         [self.view presentScene:songScene transition:[SKTransition fadeWithDuration:1.5f]];
