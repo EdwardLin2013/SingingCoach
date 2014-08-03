@@ -301,6 +301,7 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
     else
     {
         NSLog(@"succeed!");
+        _songPlayStartTime = _currTime + shortStartDelay;
         [_player playAtTime:_currTime + shortStartDelay];
     }
 }
