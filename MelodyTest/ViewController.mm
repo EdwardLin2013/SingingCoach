@@ -8,6 +8,7 @@
 #import "ViewController.h"
 #import "MyScene.h"
 #import "MainMenu.h"
+
 @implementation ViewController
 
 //Set this instead of viewDidLoad to get the correct orientation of landscape

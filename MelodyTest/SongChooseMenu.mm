@@ -21,6 +21,10 @@
         _cusSongState = 0;
         _listenButtonChandelierState = 0;
         _fileNotFound = 0;
+        _SaySomethingListenState = 0;
+        _WingsListenState = 0;
+        _DemonsListenState = 0;
+        
         SKSpriteNode *BG  = [SKSpriteNode spriteNodeWithImageNamed:@"SelectSong.png"];
         BG.anchorPoint = CGPointMake(0,0);
         BG.position = CGPointMake(0, 0);
@@ -42,6 +46,36 @@
         _ChandelierListenNode.xScale = _scaleW;
         _ChandelierListenNode.yScale = _scaleH;
         [self addChild:_ChandelierListenNode];
+        
+        SKSpriteNode *saySomething = [SKSpriteNode spriteNodeWithImageNamed:@"SaySomething.png"];
+        saySomething.anchorPoint = CGPointMake(0, 0);
+        saySomething.position = CGPointMake(94, 320-172);
+        [self addChild:saySomething];
+   
+        _SaySomethingListenNode = [SKSpriteNode spriteNodeWithImageNamed:@"ListenOff.png"];
+        _SaySomethingListenNode.anchorPoint = CGPointMake(0, 0);
+        _SaySomethingListenNode.position = CGPointMake(320, 320-173);
+        [self addChild:_SaySomethingListenNode];
+        
+        SKSpriteNode *wings = [SKSpriteNode spriteNodeWithImageNamed:@"wings.png"];
+        wings.anchorPoint = CGPointMake(0, 0);
+        wings.position  = CGPointMake( 92, 320-240);
+        [self addChild:wings];
+        
+        _DemonsListenNode = [SKSpriteNode spriteNodeWithImageNamed:@"ListenOff.png"];
+        _DemonsListenNode.anchorPoint = CGPointMake(0, 0);
+        _DemonsListenNode.position = CGPointMake(320, 320-307);
+        [self addChild:_DemonsListenNode];
+        
+        _WingsListenNode = [SKSpriteNode spriteNodeWithImageNamed:@"ListenOff.png"];
+        _WingsListenNode.anchorPoint = CGPointMake(0, 0);
+        _WingsListenNode.position = CGPointMake(320, 320-241);
+        [self addChild:_WingsListenNode];
+        
+        SKSpriteNode* demons = [SKSpriteNode spriteNodeWithImageNamed:@"Demons.png"];
+        demons.anchorPoint = CGPointMake(0, 0);
+        demons.position = CGPointMake(94, 320-301);
+        [self addChild:demons];
         
         SKSpriteNode *CustomSong = [SKSpriteNode spriteNodeWithImageNamed:@"CustomSong.png"];
         CustomSong.anchorPoint = CGPointMake(0, 0);
@@ -123,23 +157,18 @@
             float lyricsDurationfloat = [lyricsDuration floatValue];
             NSString *pianoName = [listArray objectAtIndex:0];
             [listArray removeObjectAtIndex:0];
-            NSString *C3position = [listArray objectAtIndex:0];
-            float C3YPos = [C3position floatValue];
-            [listArray removeObjectAtIndex:0];
+            float C3YPos = [self getC3YPos:pianoName];
             NSString *songName = [listArray objectAtIndex:0];
             [listArray removeObjectAtIndex:0];
-         
-            //NSLog(songName);
+
             
             NSString *tempoString = [listArray objectAtIndex:0];
           
-            //NSLog(tempoString);
             
             float tempo = [tempoString floatValue];
             [listArray removeObjectAtIndex:0];
             NSString *delayString = [listArray objectAtIndex:0];
-          
-            //NSLog(delayString);
+
             
             float delay = [delayString floatValue];
             [listArray removeObjectAtIndex:0];
@@ -176,12 +205,84 @@
         {
             CGRect Chandelier = CGRectMake(78*_scaleW, (320-126)*_scaleH, 200*_scaleW, 64*_scaleH);
             CGRect ChandelierListen = CGRectMake(320*_scaleW, (320-111)*_scaleH,60*_scaleW,60*_scaleH);
+            
+            CGRect SaySomething = CGRectMake(78, 320-190, 200, 64);
+            CGRect SaySomethingListen = CGRectMake(320, 320-173, 60, 60);
+            
+            CGRect Wings = CGRectMake(78, 320-255, 200, 64);
+            CGRect WingsListen = CGRectMake(320, 320-241, 60, 60);
+            
             NSString* ChandelierPath = [[NSBundle mainBundle] pathForResource:@"chandelier" ofType:@"mp3"];
             NSURL* ChandelierURL = [NSURL fileURLWithPath:ChandelierPath];
+            
+            NSString* saysomethingPath = [[NSBundle mainBundle] pathForResource:@"saysomething" ofType:@"mp3"];
+            NSURL* SaySomethingURL = [NSURL fileURLWithPath:saysomethingPath];
+            
+            NSString* WingsPath = [[NSBundle mainBundle] pathForResource:@"wings" ofType:@"mp3"];
+            NSURL* WingsURL = [NSURL fileURLWithPath:WingsPath];
+            
+            CGRect Demons = CGRectMake(78, 0, 200, 64);
+            CGRect DemonsListen = CGRectMake(320, 320-307, 60, 60);
+            
+            NSString* DemonsPath = [[NSBundle mainBundle]pathForResource:@"demons" ofType:@"mp3"];
+            NSURL* DemonsURL = [NSURL fileURLWithPath:DemonsPath];
     
             CGRect CustomSong = CGRectMake(78*_scaleW,( 320-62)*_scaleH, 323*_scaleW, 64*_scaleH);
             CGRect exitButton = CGRectMake(0*_scaleW, (320-86)*_scaleH, 74*_scaleW  , 86*_scaleH);
 
+            if (CGRectContainsPoint(Demons, location)){
+                [_userDefs setInteger:4 forKey:@"songType"];
+                [_listenDemons stop];
+                [_player play];
+                
+                NSLog(@"Song Beginning");
+                
+                NSString *fileName = @"imagineDragons";
+                NSString *filepath = [[NSBundle mainBundle] pathForResource:fileName ofType:@"txt"];
+                NSError *error;
+                NSString *fileContents = [NSString stringWithContentsOfFile:filepath encoding:NSUTF8StringEncoding error:&error];
+                
+                if (error)
+                {
+                    NSLog(@"Error reading file: %@", error.localizedDescription);
+                    _fileNotFound = 1;
+                    [_textField removeFromSuperview];
+                    [self addChild:_FileNotFound];
+                }
+                else
+                {
+                    NSMutableArray* listArray = [NSMutableArray arrayWithArray:[fileContents componentsSeparatedByString:@"\n"]];
+                    NSString* lyricsName = [listArray objectAtIndex:0];
+                    [listArray removeObjectAtIndex:0];
+                    NSString* lyricsDuration = [listArray objectAtIndex:0];
+                    [listArray removeObjectAtIndex:0];
+                    float lyricsDurationFloat = [lyricsDuration floatValue];
+                    NSString* pianoName = [listArray objectAtIndex:0];
+                    [listArray removeObjectAtIndex:0];
+                    float C3YPos = [self getC3YPos:pianoName];
+                    NSString* songName = [listArray objectAtIndex:0];
+                    [listArray removeObjectAtIndex:0];
+                    NSString* tempoString = [listArray objectAtIndex:0];
+                    float tempo = [tempoString floatValue];
+                    [listArray removeObjectAtIndex:0];
+                    NSString* delayString = [listArray objectAtIndex:0];
+                    float delay = [delayString floatValue];
+                    [listArray removeObjectAtIndex:0];
+                    SKScene* SongScene = [[HeadPhones alloc]initWithSize:self.size
+                                                            withSongName:songName
+                                                               withTempo:tempo
+                                                               withDelay:delay
+                                                               withInput:listArray
+                                                              withC3YPos:C3YPos
+                                                           withPianoName:pianoName
+                                                              withLyrics:lyricsName
+                                                      withLyricsDuration:lyricsDurationFloat];
+                    SongScene.scaleMode = SKSceneScaleModeAspectFill;
+                    [self.view presentScene:SongScene transition:[SKTransition fadeWithDuration:1.5f]];
+                
+            }
+
+            }
             if (CGRectContainsPoint(Chandelier, location))
             {
                 [_userDefs setInteger:1 forKey:@"songType"];
@@ -216,9 +317,7 @@
                         float lyricsDurationFloat = [lyricsDuration floatValue];
                         NSString* pianoName = [listArray objectAtIndex:0];
                         [listArray removeObjectAtIndex:0];
-                        NSString* C3position = [listArray objectAtIndex:0];
-                        float C3YPos = [C3position floatValue];
-                        [listArray removeObjectAtIndex:0];
+                        float C3YPos = [self getC3YPos:pianoName];
                         NSString* songName = [listArray objectAtIndex:0];
                         [listArray removeObjectAtIndex:0];
                         NSString* tempoString = [listArray objectAtIndex:0];
@@ -241,6 +340,181 @@
                     }
                 }
             }
+            else if (CGRectContainsPoint(Wings, location))
+            {
+                [_userDefs setInteger:3 forKey:@"songType"];
+                [_player play];
+                [_listenWings stop];
+                NSString *fileName = @"birdy";
+                NSString *filepath = [[NSBundle mainBundle] pathForResource:fileName ofType:@"txt"];
+                NSError *error;
+                NSString *fileContents = [NSString stringWithContentsOfFile:filepath encoding:NSUTF8StringEncoding error:&error];
+                
+                if (error)
+                {
+                    NSLog(@"Error reading file: %@", error.localizedDescription);
+                }
+                else
+                {
+                    NSMutableArray* listArray = [NSMutableArray arrayWithArray:[fileContents componentsSeparatedByString:@"\n"]];
+                    NSString* lyricsName = [listArray objectAtIndex:0];
+                    [listArray removeObjectAtIndex:0];
+                    NSString* lyricsDuration = [listArray objectAtIndex:0];
+                    [listArray removeObjectAtIndex:0];
+                    float lyricsDurationFloat = [lyricsDuration floatValue];
+                    NSString* pianoName = [listArray objectAtIndex:0];
+                    [listArray removeObjectAtIndex:0];
+
+                    float C3YPos = [self getC3YPos:pianoName];
+
+                    NSString* songName = [listArray objectAtIndex:0];
+                    [listArray removeObjectAtIndex:0];
+                    NSString* tempoString = [listArray objectAtIndex:0];
+                    float tempo = [tempoString floatValue];
+                    [listArray removeObjectAtIndex:0];
+                    NSString* delayString = [listArray objectAtIndex:0];
+                    float delay = [delayString floatValue];
+                    [listArray removeObjectAtIndex:0];
+                    SKScene* SongScene = [[HeadPhones alloc]initWithSize:self.size
+                                                            withSongName:songName
+                                                               withTempo:tempo
+                                                               withDelay:delay
+                                                               withInput:listArray
+                                                              withC3YPos:C3YPos
+                                                           withPianoName:pianoName
+                                                              withLyrics:lyricsName
+                                                      withLyricsDuration:lyricsDurationFloat];
+                    SongScene.scaleMode = SKSceneScaleModeAspectFill;
+                    [self.view presentScene:SongScene transition:[SKTransition fadeWithDuration:1.5f]];
+                }
+                
+
+            }
+            else if (CGRectContainsPoint(SaySomething, location))
+            {
+                [_userDefs setInteger:2 forKey:@"songType"];
+                [_player play];
+                [_listenSaySomething stop];
+                NSString *fileName = @"saysomething";
+                NSString *filepath = [[NSBundle mainBundle] pathForResource:fileName ofType:@"txt"];
+                NSError *error;
+                NSString *fileContents = [NSString stringWithContentsOfFile:filepath encoding:NSUTF8StringEncoding error:&error];
+                
+                if (error)
+                {
+                    NSLog(@"Error reading file: %@", error.localizedDescription);
+                }
+                else
+                {
+                    NSMutableArray* listArray = [NSMutableArray arrayWithArray:[fileContents componentsSeparatedByString:@"\n"]];
+                    NSString* lyricsName = [listArray objectAtIndex:0];
+                    [listArray removeObjectAtIndex:0];
+                    NSString* lyricsDuration = [listArray objectAtIndex:0];
+                    [listArray removeObjectAtIndex:0];
+                    float lyricsDurationFloat = [lyricsDuration floatValue];
+                    NSString* pianoName = [listArray objectAtIndex:0];
+                    [listArray removeObjectAtIndex:0];
+
+                    float C3YPos = [self getC3YPos:pianoName];
+
+                    NSString* songName = [listArray objectAtIndex:0];
+                    [listArray removeObjectAtIndex:0];
+                    NSString* tempoString = [listArray objectAtIndex:0];
+                    float tempo = [tempoString floatValue];
+                    [listArray removeObjectAtIndex:0];
+                    NSString* delayString = [listArray objectAtIndex:0];
+                    float delay = [delayString floatValue];
+                    [listArray removeObjectAtIndex:0];
+                    SKScene* SongScene = [[HeadPhones alloc]initWithSize:self.size
+                                                            withSongName:songName
+                                                               withTempo:tempo
+                                                               withDelay:delay
+                                                               withInput:listArray
+                                                              withC3YPos:C3YPos
+                                                           withPianoName:pianoName
+                                                              withLyrics:lyricsName
+                                                      withLyricsDuration:lyricsDurationFloat];
+                    SongScene.scaleMode = SKSceneScaleModeAspectFill;
+                    [self.view presentScene:SongScene transition:[SKTransition fadeWithDuration:1.5f]];
+                }
+
+                
+            }
+            
+            else if (CGRectContainsPoint(SaySomethingListen, location) && _SaySomethingListenState == 0){
+                _listenSaySomething = [[AVAudioPlayer alloc]initWithContentsOfURL:SaySomethingURL error:&err];
+                if (err)
+                    NSLog(@"Cannot load audio");
+                else
+                {
+                    _SaySomethingListenState = 1;
+                    [_SaySomethingListenNode removeFromParent];
+                    
+                    _SaySomethingListenNode = [SKSpriteNode spriteNodeWithImageNamed:@"Listen.png"];
+                    _SaySomethingListenNode.anchorPoint = CGPointMake(0, 0);
+                    _SaySomethingListenNode.position = CGPointMake(320, 320-173);
+                    [self addChild:_SaySomethingListenNode];
+                    
+                    [_listenSaySomething play];
+                }
+            }
+            
+            else if (CGRectContainsPoint(DemonsListen, location) && _DemonsListenState == 0){
+                _DemonsListenState = 1;
+                _listenDemons = [[AVAudioPlayer alloc]initWithContentsOfURL:DemonsURL error:&err];
+                
+                [_DemonsListenNode removeFromParent];
+                _DemonsListenNode = [SKSpriteNode spriteNodeWithImageNamed:@"Listen.png"];
+                _DemonsListenNode.anchorPoint = CGPointMake(0, 0);
+                _DemonsListenNode.position = CGPointMake(320, 320-307);
+                [self addChild:_DemonsListenNode];
+                
+                [_listenDemons play];
+                
+                
+            }
+            else if (CGRectContainsPoint(DemonsListen, location) && _DemonsListenState == 1){
+                _DemonsListenState = 0;
+                [_listenDemons stop];
+                [_DemonsListenNode removeFromParent];
+                _DemonsListenNode = [SKSpriteNode spriteNodeWithImageNamed:@"ListenOff.png"];
+                _DemonsListenNode.anchorPoint = CGPointMake(0, 0);
+                _DemonsListenNode.position = CGPointMake(320, 320-307);
+                [self addChild:_DemonsListenNode];
+                
+            }
+            else if (CGRectContainsPoint(WingsListen, location) && _WingsListenState == 0){
+                _listenWings = [[AVAudioPlayer alloc]initWithContentsOfURL:WingsURL error:&err];
+                if (err)
+                    NSLog(@"Cannot load audio");
+                else
+                {
+                    _WingsListenState= 1;
+                    [_WingsListenNode removeFromParent];
+                    
+                    _WingsListenNode = [SKSpriteNode spriteNodeWithImageNamed:@"Listen.png"];
+                    _WingsListenNode.anchorPoint = CGPointMake(0, 0);
+                    _WingsListenNode.position = CGPointMake(320, 320-241);
+
+                    [self addChild:_WingsListenNode];
+                    
+                    [_listenWings play];
+                }
+
+            }
+            
+            else if (CGRectContainsPoint(WingsListen, location) && _WingsListenState == 1){
+                _WingsListenState = 0;
+                [_WingsListenNode removeFromParent];
+                
+                _WingsListenNode = [SKSpriteNode spriteNodeWithImageNamed:@"ListenOff.png"];
+                _WingsListenNode.anchorPoint = CGPointMake(0, 0);
+                _WingsListenNode.position = CGPointMake(320, 320-241);
+                [self addChild:_WingsListenNode];
+                
+                [_listenWings stop];
+            }
+            
             else if (CGRectContainsPoint(ChandelierListen, location) && _listenButtonChandelierState == 0)
             {
                 _listen = [[AVAudioPlayer alloc]initWithContentsOfURL:ChandelierURL error:&err];
@@ -264,6 +538,18 @@
                 }
             }
     
+            else if (CGRectContainsPoint(SaySomethingListen, location) && _SaySomethingListenState == 1){
+                _SaySomethingListenState = 0;
+                [_SaySomethingListenNode removeFromParent];
+                
+                _SaySomethingListenNode = [SKSpriteNode spriteNodeWithImageNamed:@"ListenOff.png"];
+                _SaySomethingListenNode.anchorPoint = CGPointMake(0, 0);
+                _SaySomethingListenNode.position = CGPointMake(320, 320-173);
+                [self addChild:_SaySomethingListenNode];
+                
+                [_listenSaySomething stop];
+            }
+            
             else if (CGRectContainsPoint(ChandelierListen, location) && _listenButtonChandelierState == 1)
             {
                 _listenButtonChandelierState = 0;
@@ -336,4 +622,23 @@
     }
 }
 
+-(float) getC3YPos:(NSString*)pianoName
+{
+    if ([pianoName compare:@"pianoA2A4.png"]==0){
+        return 35.0;
+    }
+    else if ([pianoName compare:@"pianoD3D5.png"]==0){
+        return -29.0;
+    }
+    else if([pianoName compare:@"pianoB2B4.png"]==0){
+        return 9.0;
+    }
+    else if ([pianoName compare:@"pianoG2G4.png"]==0){
+        return 62.0;
+    }
+    else if ([pianoName compare:@"pianoG3G5.png"]==0){
+        return -94.0;
+    }
+    return 0;
+}
 @end

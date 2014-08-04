@@ -1,7 +1,6 @@
 ChandelierLyrics
 80
 pianoG3G5.png
--94
 chandelier
 175
 1.3
@@ -35,13 +34,14 @@ chandelier
 0.5 F4
 0.5 F4
 1.0 F4
-1.0 C4
+0.5 Bb3
+0.5 Bb3
 1.0 F4
 1.0 F4
 1.0 F4
-0.5 Gb4
-1.5 F4
+1.0 Ab4
 0.5 F4
+0.5 Eb4
 0.5 Eb4
 1.0 Eb4
 1.0 Eb4
@@ -60,19 +60,19 @@ chandelier
 2.0 F4
 6.0 rest
 1.0 Db4
-1.0 B3
-1.0 B3
+1.0 Bb3
+1.0 Bb3
 1.0 Db4
-1.0 B3
-1.0 B3
-2.0 B3
+1.0 Bb3
+1.0 Bb3
+2.0 Bb3
 1.0 Db4
-1.0 B3
-1.0 B3
+1.0 Bb3
+1.0 Bb3
 1.0 Db4
-1.0 B3
-1.0 B3
-2.0 B3
+1.0 Bb3
+1.0 Bb3
+2.0 Bb3
 1.0 C4
 1.0 C4
 1.0 C4
@@ -80,15 +80,15 @@ chandelier
 1.0 C4
 1.0 C4
 2.0 C4
-0.5 C4
+0.5 Bb3
 0.5 C4
 1.5 C4
 1.0 C4
-1.0 C4
+1.0 Ab3
 1.0 C4
 0.5 C4
 0.5 Db4
-2.5 B3
+2.5 C4
 6.0 Db5
 0.5 rest
 1.0 Bb4

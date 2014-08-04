@@ -103,6 +103,7 @@
     
     NSTimeInterval            _songPlayStartTime;
     NSTimeInterval            _pauseTime;
+    NSTimeInterval            _finishTime;
 }
 
 @property (nonatomic, strong) AVAudioPlayer* player;

@@ -1,4 +1,6 @@
-
+Title: Six Degrees
+of Separation
+Artist: The Script
 
 You've read the books
 You've watched 
@@ -60,3 +62,4 @@ And the sixth,
 is when you admit
 that you may have
 messed up a little
+

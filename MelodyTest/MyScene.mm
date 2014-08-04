@@ -417,6 +417,7 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
             // change the UI
             [_SaveRecordingOverlay removeFromParent];
             [self addChild:_songOver];
+            _finishTime = CACurrentMediaTime();
             _songIsOver = 2;
             
         }
@@ -428,7 +429,7 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
         CGRect replay = CGRectMake(173, 320-184, 91, 26);
         CGRect exitSong = CGRectMake(313, 320-184, 91, 26);
         
-        if (CGRectContainsPoint(replay, location))
+        if (CGRectContainsPoint(replay, location) && ((CACurrentMediaTime() - _finishTime)>2.0f))
         {
             SKScene *replaySong = [[MyScene alloc]initWithSize:self.size withSongName:_songName withTempo:_tempo withDelay:_delay withInput:_StringInput withC3YPos:_C3Ypos withPianoName:_pianoName withLyrics:_LyricsName withLyricsDuration:_lyricsDuration];
             replaySong.scaleMode = SKSceneScaleModeAspectFill;
@@ -445,9 +446,10 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
 
             [self.view presentScene:replaySong transition:[SKTransition crossFadeWithDuration:1.5]];
         }
-        else if (CGRectContainsPoint(exitSong, location))
+        else if (CGRectContainsPoint(exitSong, location)&& ((CACurrentMediaTime() - _finishTime)>2.0f))
         {
             NSLog(@"Exiting song");
+            
             /* Stop the microphone */
             [_audioController stopIOUnit];
             _audioController = NULL;
@@ -739,7 +741,7 @@ withShortStartDelay:(NSTimeInterval)shortStartDelay
         yPositionforArrow = _framesize.height - 3;
     
     CGPoint position = CGPointMake(_starting, yPositionforArrow + 5);
-    SKAction *moveToLocation = [SKAction moveTo:position duration:0.1];
+    SKAction *moveToLocation = [SKAction moveTo:position duration:0.3];
     [_Arrow runAction:moveToLocation];
 }
 

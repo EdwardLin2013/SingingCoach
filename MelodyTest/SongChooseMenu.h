@@ -7,7 +7,6 @@
 //
 #import <SpriteKit/SpriteKit.h>
 #import "MainMenu.h"
-#import "MyScene.h"
 #import <AVFoundation/AVFoundation.h>
 #import "HeadPhones.h"
 
@@ -16,12 +15,23 @@
 {
     AVAudioPlayer*  _player;
     AVAudioPlayer*  _listen;
+    AVAudioPlayer*  _listenSaySomething;
+    AVAudioPlayer*  _listenWings;
+    AVAudioPlayer*  _listenDemons;
     
     double          _scaleH;
     double          _scaleW;
     
     int             _listenButtonChandelierState;   //state whether chandelier listen button is pressed
     SKSpriteNode*   _ChandelierListenNode;
+    SKSpriteNode*   _SaySomethingListenNode;
+    int             _SaySomethingListenState;
+    
+    SKSpriteNode*   _WingsListenNode;
+    int             _WingsListenState;
+    
+    SKSpriteNode*   _DemonsListenNode;
+    int             _DemonsListenState;
     
     SKSpriteNode*   _customSongOvr;
     int             _cusSongState;                  //state whether customsong is pressed
@@ -39,6 +49,7 @@
 -(void) processReturn;
 -(void) setupTextField;
 -(BOOL) textFieldShouldReturn:(UITextField *)theTextField;
+-(float) getC3YPos:(NSString*)pianoName;
 /* -----------------------------Private Methods--------------------------------- End */
 
 
